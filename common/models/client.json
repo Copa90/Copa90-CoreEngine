@@ -22,6 +22,10 @@
       "required": true,
       "index": true
     },
+    "status": {
+      "type": "string",
+      "required": false
+    },
     "time": {
       "type": "number",
       "required": true,
