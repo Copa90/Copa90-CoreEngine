@@ -106,6 +106,12 @@
       "property": "__destroy__accountInfo"
     },
     {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "__get__Transactions"
+    },
+    {
       "accessType": "*",
       "principalType": "ROLE",
       "principalId": "founder",
