@@ -19,7 +19,7 @@ module.exports = function (app) {
       time: time,
       status: status,
       emailVerified: true,
-      phoneNumber: '09121513962'
+      phoneNumber: '09120001122'
     },
     {
       username: 'support1',
@@ -135,7 +135,16 @@ module.exports = function (app) {
   }
 
   User.create(users, function (err, users) {
-    createRoles(users)
+    if (err) {
+      User.find({'where': {'phoneNumber': '09120001122'}}, function(err, result) {
+        if (err)
+          throw err
+        createRoles(result)
+      })
+    }
+    else {
+      createRoles(users)
+    }
   })
 
 }

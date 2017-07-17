@@ -15,6 +15,8 @@ var relationMethodPrefixes = [
   'prototype.patchAttributes'
 ]
 
+var userStatus = require('../../config/userStatus.json')
+
 module.exports = function(client) {
 
 	methodDisabler.disableOnlyTheseMethods(client, relationMethodPrefixes)
@@ -45,7 +47,8 @@ module.exports = function(client) {
     if (!utility.inputChecker(ctx.args.data, whiteList))
       return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
     else {
-			ctx.args.data.emailVerified = true
+      ctx.args.data.emailVerified = true
+      ctx.args.data.status        = userStatus.available
       ctx.args.data.email 				= ctx.args.data.email.toLowerCase()
       ctx.args.data.accountInfo 	= {}
       ctx.args.data.accountInfo.chances 		= 0
