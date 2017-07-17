@@ -1,0 +1,46 @@
+{
+  "name": "transaction",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "packageId": {
+      "type": "string",
+      "required": true
+    },
+    "time": {
+      "type": "number",
+      "required": true
+    },
+    "price": {
+      "type": "number",
+      "required": true,
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "required": true
+    },
+    "receiptInfo": {
+      "type": "object",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "client": {
+      "type": "belongsTo",
+      "model": "client",
+      "foreignKey": "clientId"
+    },
+    "package": {
+      "type": "belongsTo",
+      "model": "package",
+      "foreignKey": "packageId"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

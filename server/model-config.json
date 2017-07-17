@@ -67,5 +67,9 @@
   "package": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "transaction": {
+    "dataSource": "mongoDs",
+    "public": true
   }
 }

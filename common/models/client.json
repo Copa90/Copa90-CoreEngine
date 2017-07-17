@@ -49,12 +49,17 @@
     "accountInfo": {
       "type": "embedsOne",
       "model": "accountInfo",
-      "property": "accountInfo",
+      "property": "accountInfoModel",
       "options": {
         "validate": true,
         "forceId": true,
         "persistent": true
       }
+    },
+    "transactions": {
+      "type": "hasMany",
+      "model": "transaction",
+      "foreignKey": "clientId"
     }
   },
   "acls": [

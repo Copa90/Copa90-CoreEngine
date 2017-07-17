@@ -38,8 +38,15 @@
     }
   },
   "validations": [],
-  "relations": {},
-  "acls": [{
+  "relations": {
+    "transactions": {
+      "type": "hasMany",
+      "model": "transaction",
+      "foreignKey": "packageId"
+    }
+  },
+  "acls": [
+    {
       "principalType": "ROLE",
       "principalId": "$everyone",
       "permission": "DENY"
