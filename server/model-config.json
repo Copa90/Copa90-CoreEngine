@@ -43,5 +43,9 @@
   "accountInfo": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "predict": {
+    "dataSource": "mongoDs",
+    "public": true
   }
 }
