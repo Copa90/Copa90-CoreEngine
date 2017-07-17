@@ -57,7 +57,8 @@
       }
     }
   },
-  "acls": [{
+  "acls": [
+    {
       "principalType": "ROLE",
       "principalId": "$authenticated",
       "permission": "ALLOW",
