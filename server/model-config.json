@@ -47,5 +47,9 @@
   "predict": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "league": {
+    "dataSource": "mongoDs",
+    "public": true
   }
 }
