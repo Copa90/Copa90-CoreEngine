@@ -5,6 +5,10 @@
   "options": {
     "validateUpsert": true
   },
+  "hidden": [
+    "realm",
+    "emailVerified"
+  ],
   "properties": {
     "password": {
       "type": "string",
@@ -43,9 +47,5 @@
   "validations": [],
   "relations": {},
   "acls": [],
-  "hidden": [
-    "realm",
-    "emailVerified"
-  ],
   "methods": {}
 }
