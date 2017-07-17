@@ -59,5 +59,9 @@
   "challenge": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "champion": {
+    "dataSource": "mongoDs",
+    "public": true
   }
 }
