@@ -56,5 +56,8 @@
     "dataSource": "mongoDs",
     "public": true
   },
+  "challenge": {
+    "dataSource": "mongoDs",
+    "public": true
   }
 }
