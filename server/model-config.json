@@ -63,5 +63,9 @@
   "champion": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "package": {
+    "dataSource": "mongoDs",
+    "public": true
   }
 }
