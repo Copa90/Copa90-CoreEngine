@@ -51,5 +51,10 @@
   "league": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "estimate": {
+    "dataSource": "mongoDs",
+    "public": true
+  },
   }
 }
