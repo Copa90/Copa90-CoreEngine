@@ -10,6 +10,16 @@
       "type": "number",
       "required": true,
       "default": 0
+    },
+    "roundWins": {
+      "type": "number",
+      "required": true,
+      "default": 0
+    },
+    "totalPoints": {
+      "type": "number",
+      "required": true,
+      "default": 0
     }
   },
   "validations": [],
