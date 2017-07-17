@@ -39,5 +39,9 @@
   "client": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "accountInfo": {
+    "dataSource": "mongoDs",
+    "public": true
   }
 }
