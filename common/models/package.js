@@ -65,9 +65,10 @@ module.exports = function(package) {
     var whiteList = ['name', 'beginningTime', 'endingTime', 'chances', 'offer', 'explanation']
     if (!utility.inputChecker(ctx.args.data, whiteList))
       return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
-		var time = utility.getUnixTimeStamp() - 300000
-		if ((ctx.args.data.beginningTime && ctx.args.data.endingTime) && !(ctx.args.data.beginningTime >= time && ctx.args.data.endingTime <= time))
-			return next(new Error('Error in BeginningTime and EndingTime Date Times'))
+		var time = utility.getUnixTimeStamp()
+		if (ctx.args.data.beginningTime && ctx.args.data.endingTime)
+			if (ctx.args.data.beginningTime < time || ctx.args.data.endingTime < time || ctx.args.data.beginningTime > ctx.args.data.endingTime)
+				return next(new Error('Error in BeginningTime and EndingTime Date Times'))
 		ctx.args.data.status = statusConfig.created
     return next()
   })
