@@ -5,9 +5,39 @@
   "options": {
     "validateUpsert": true
   },
-  "properties": {},
+  "properties": {
+    "creatorId": {
+      "type": "number",
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "capacity": {
+      "type": "number",
+      "required": true
+    },
+    "reduceChances": {
+      "type": "number",
+      "required": true,
+      "default": 0
+    },
+    "beginningTime": {
+      "type": "number",
+      "required": false,
+      "default": 0
+    }
+  },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "clients": {
+      "type": "hasMany",
+      "model": "client",
+      "foreignKey": "championId",
+      "through": "ranking"
+    }
+  },
   "acls": [],
   "methods": {}
 }
