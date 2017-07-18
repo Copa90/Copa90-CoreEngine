@@ -65,6 +65,12 @@
       "type": "hasMany",
       "model": "estimate",
       "foreignKey": "clientId"
+    },
+    "champions": {
+      "type": "hasMany",
+      "model": "champion",
+      "foreignKey": "clientId",
+      "through": "ranking"
     }
   },
   "acls": [
