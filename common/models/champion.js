@@ -60,6 +60,47 @@ module.exports = function(champion) {
 		})
 	})
 
+	champion.beforeRemote('deleteById', function (ctx, modelInstance, next) {
+    if (!ctx.args.options.accessToken)
+      return next()
+		function returnChances(championModel, clientModel) {
+			championModel.clients(function(err, champClientsList) {
+				if (err)
+					return next(err)
+				if (champClientsList.length == 1) {
+					var newChances = clientModel.accountInfoModel.chances + championModel.reduceChances
+					clientModel.accountInfo.update({'chances': newChances}, function(err, result) {
+						if (err)
+							return next(err)
+						return next()
+					})
+				}
+				else 
+					return next()
+			})
+		}
+		roleManager.getRolesById(app, ctx.args.options.accessToken.userId, function (err, response) {
+      if (err)
+				return next(err)
+			champion.findById(ctx.args.data.id, function(err, championInst) {
+				if (err)
+					return next(err)
+				var client = app.models.client
+				client.findById(championInst.creatorId, function(err, clientInst) {
+					if (err)
+						return callback(err)
+					if (response.roles.length == 0) {
+						if (ctx.args.options.accessToken.userId !== championInst.creatorId)
+							return next(new Error('You have not Access to Champion!'))							
+						returnChances(championInst, clientInst)
+					}
+					else 
+						returnChances(championInst, clientInst)
+				})
+			})
+		})
+	})
+
   champion.joinChampion = function (ctx, championId, clientId, callback) {
 		champion.findById(championId, function(err, championInst) {
 			if (err)
