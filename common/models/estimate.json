@@ -5,9 +5,35 @@
   "options": {
     "validateUpsert": true
   },
-  "properties": {},
+  "properties": {
+    "time": {
+      "type": "number",
+      "required": true
+    },
+    "checkTime": {
+      "type": "number",
+      "required": false,
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "required": false,
+      "default": "Unknown"
+    }
+  },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "clientRel": {
+      "type": "belongsTo",
+      "model": "client",
+      "foreignKey": "clientId"
+    },
+    "predictRel": {
+      "type": "belongsTo",
+      "model": "predict",
+      "foreignKey": "predictId"
+    }
+  },
   "acls": [],
   "methods": {}
 }
