@@ -54,6 +54,7 @@ module.exports = function(client) {
       ctx.args.data.accountInfo.chances 		= 0
       ctx.args.data.accountInfo.roundWins 	= 0
       ctx.args.data.accountInfo.totalPoints = 0
+      ctx.args.data.accountInfo.totalEstimates = 0
       return next()
     }
   })
@@ -69,7 +70,9 @@ module.exports = function(client) {
 			if (ctx.args.data.roundWins)
 				ctx.args.data.roundWins 	+= result.accountInfo.roundWins
 			if (ctx.args.data.totalPoints)
-				ctx.args.data.totalPoints += result.accountInfo.totalPoints			
+        ctx.args.data.totalPoints += result.accountInfo.totalPoints	
+			if (ctx.args.data.totalEstimates)
+        ctx.args.data.totalEstimates += result.accountInfo.totalEstimates	      		
       return next()
     })
   })

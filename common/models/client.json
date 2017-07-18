@@ -60,6 +60,11 @@
       "type": "hasMany",
       "model": "transaction",
       "foreignKey": "clientId"
+    },
+    "estimates": {
+      "type": "hasMany",
+      "model": "estimate",
+      "foreignKey": "clientId"
     }
   },
   "acls": [
@@ -110,6 +115,12 @@
       "principalId": "$owner",
       "permission": "ALLOW",
       "property": "__get__transactions"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "__get__estimates"
     },
     {
       "accessType": "*",
