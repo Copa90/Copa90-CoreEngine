@@ -5,9 +5,55 @@
   "options": {
     "validateUpsert": true
   },
-  "properties": {},
+  "properties": {
+    "explanation": {
+      "type": "string",
+      "required": true
+    },
+    "weekNumber": {
+      "type": "number",
+      "required": true
+    },
+    "possibility": {
+      "type": "number",
+      "required": true
+    },
+    "point": {
+      "type": "number",
+      "required": true
+    },
+    "beginningTime": {
+      "type": "number",
+      "required": true
+    },
+    "endingTime": {
+      "type": "number",
+      "required": true
+    },
+    "status": {
+      "type": "string",
+      "required": false,
+      "default": "Created"
+    },
+    "occurrence": {
+      "type": "number",
+      "required": false,
+      "default": 0
+    }
+  },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "leagueRel": {
+      "type": "belongsTo",
+      "model": "league",
+      "foreignKey": "leagueId"
+    },
+    "estimates": {
+      "type": "hasMany",
+      "model": "estimate",
+      "foreignKey": "predictId"
+    }
+  },
   "acls": [],
   "methods": {}
 }
