@@ -75,5 +75,9 @@
   "ranking": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "competition": {
+    "dataSource": "mongoDs",
+    "public": true
   }
 }
