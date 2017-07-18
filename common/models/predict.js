@@ -97,8 +97,8 @@ module.exports = function(predict) {
 		})
 	})
 
-	startPackages.start()
-	finishPackages.start()
+	startPredicts.start()
+	finishPredicts.start()
 
   predict.afterRemote('create', function (ctx, modelInstance, next) {
 		var league = app.models.league

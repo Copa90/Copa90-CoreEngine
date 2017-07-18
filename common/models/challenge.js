@@ -212,8 +212,6 @@ module.exports = function(challenge) {
 		challenge.findById(challengeId, function(err, challengeInst) {
 			if (err)
 				return callback(err)
-			if (ctx.req.accessToken.userId !== challengeInst.creatorId)
-				return callback(new Error('Owner Error'))
 			if (ctx.req.accessToken.userId === clientId)
 				return callback(new Error('Owner Can not Leave'))
 			var client = app.models.client
