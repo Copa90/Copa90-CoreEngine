@@ -2,7 +2,6 @@ var app = require('../../server/server')
 var roleManager = require('../../public/roleManager')
 
 var utility	= require('../../public/utility')
-var statusConfig = require('../../config/transactionStatus.json')
 
 module.exports = function(champion) {
 
@@ -30,7 +29,12 @@ module.exports = function(champion) {
 			modelInstance.clients.add(clientInst, function(err, result) {
 				if (err)
 					return next(err)
-				return next()				
+				var newChances = clientInst.accountInfoModel.chances - modelInstance.reduceChances
+				clientInst.accountInfo.update({'chances': newChances}, function(err, result) {
+					if (err)
+						return next(err)
+					return next()					
+				})
 			})
 		})
 	})
@@ -110,13 +114,21 @@ module.exports = function(champion) {
 					return callback(err)
 				if (champClientsList.length + 1 > championInst.capacity)
 					return callback(new Error('Capacity is Full'))
+				var client = app.models.client
 				client.findById(clientId, function(err, clientInst) {
 					if (err)
 						return callback(err)
+					if (clientInst.accountInfoModel.chances < championInst.reduceChances)
+						return callback(new Error('Not Enough Chances to Join'))
 					championInst.clients.add(clientInst, function(err, result) {
 						if (err)
 							return callback(err)
-						return callback(null, 'Successfuly Joined')
+						var newChances = clientInst.accountInfoModel.chances - championInst.reduceChances
+						clientInst.accountInfo.update({'chances': newChances}, function(err, result) {
+							if (err)
+								return callback(err)
+							return callback(null, 'Successfuly Joined')							
+						})
 					})
 				})
 			})
