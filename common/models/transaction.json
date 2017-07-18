@@ -6,10 +6,6 @@
     "validateUpsert": true
   },
   "properties": {
-    "packageId": {
-      "type": "string",
-      "required": true
-    },
     "time": {
       "type": "number",
       "required": true

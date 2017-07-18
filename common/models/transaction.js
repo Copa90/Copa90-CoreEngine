@@ -20,9 +20,14 @@ module.exports = function(transaction) {
 			package.findById(ctx.args.data.packageId, function(err, packageInst) {
 				if (err)
 					return next(err)
-				modelInstance.clientRel(clientInst)
-				modelInstance.packageRel(packageInst)
-				return next()
+				var newChances = client.accountInfoModel.chances + packageInst.chances
+				clientInst.accountInfo.update({'chances': newChances}, function(err, instance) {
+					if (err)
+						return next(err)
+					modelInstance.clientRel(clientInst)
+					modelInstance.packageRel(packageInst)
+					return next()					
+				})
 			})
 		})
 	})
