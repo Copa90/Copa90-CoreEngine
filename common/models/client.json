@@ -71,6 +71,12 @@
       "model": "champion",
       "foreignKey": "clientId",
       "through": "ranking"
+    },
+    "challenges": {
+      "type": "hasMany",
+      "model": "challenge",
+      "foreignKey": "clientId",
+      "through": "competition"
     }
   },
   "acls": [
