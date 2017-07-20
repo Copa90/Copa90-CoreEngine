@@ -79,5 +79,9 @@
   "competition": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "verification": {
+    "dataSource": "mongoDs",
+    "public": true
   }
 }
