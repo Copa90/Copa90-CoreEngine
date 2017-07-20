@@ -43,20 +43,27 @@ module.exports = function(client) {
       ctx.args.data.password 	= pass1
       ctx.req.body.password 	= pass2
     }
-    var whiteList = ['status', 'email', 'username', 'password', 'time', 'phoneNumber', 'fullname']
-    if (!utility.inputChecker(ctx.args.data, whiteList))
-      return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
-    else {
-      ctx.args.data.emailVerified = true
-      ctx.args.data.status        = userStatus.available
-      ctx.args.data.email 				= ctx.args.data.email.toLowerCase()
-      ctx.args.data.accountInfo 	= {}
-      ctx.args.data.accountInfo.chances 		= 0
-      ctx.args.data.accountInfo.roundWins 	= 0
-      ctx.args.data.accountInfo.totalPoints = 0
-      ctx.args.data.accountInfo.totalEstimates = 0
-      return next()
-    }
+    var verification = app.models.verification
+    verification.checkUserVerification(ctx.args.data.phoneNumber, function(err, result) {
+      if (err)
+        return next(err)
+      if (!result)
+        return next(new Error('Not Verified Yet!'))
+      var whiteList = ['status', 'email', 'username', 'password', 'time', 'phoneNumber', 'fullname']
+      if (!utility.inputChecker(ctx.args.data, whiteList))
+        return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
+      else {
+        ctx.args.data.emailVerified = true
+        ctx.args.data.status        = userStatus.available
+        ctx.args.data.email 				= ctx.args.data.email.toLowerCase()
+        ctx.args.data.accountInfo 	= {}
+        ctx.args.data.accountInfo.chances 		= 0
+        ctx.args.data.accountInfo.roundWins 	= 0
+        ctx.args.data.accountInfo.totalPoints = 0
+        ctx.args.data.accountInfo.totalEstimates = 0
+        return next()
+      }
+    })
   })
 
   client.beforeRemote('prototype.__update__accountInfo', function (ctx, modelInstance, next) {
