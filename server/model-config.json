@@ -83,5 +83,9 @@
   "verification": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "trophy": {
+    "dataSource": null,
+    "public": false
   }
 }
