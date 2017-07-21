@@ -13,8 +13,8 @@ module.exports = function(champion) {
 				return next(err)
 			if (clientInst.accountInfo.chances < ctx.args.data.reduceChances)
 				return next(new Error('You Do not Have That Propper Chances!'))
-			if (ctx.args.data.capacity < 3)
-				return next(new Error('Capacity Can not be Less than 3!'))
+			if (ctx.args.data.capacity < 5)
+				return next(new Error('Capacity Can not be Less than 5!'))
 			ctx.args.data.beginningTime = time
 			ctx.args.data.hitRate = 0
 			return next()
@@ -54,8 +54,8 @@ module.exports = function(champion) {
 					var whiteList = ['name', 'capacity', 'reduceChances']
 					if (!utility.inputChecker(ctx.args.data, whiteList))
 						return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
-					if (ctx.args.data.capacity < 3)
-						return next(new Error('Capacity Can not be Less than 3!'))
+					if (ctx.args.data.capacity < 5)
+						return next(new Error('Capacity Can not be Less than 5!'))
 					return next()
 				})
 			}
