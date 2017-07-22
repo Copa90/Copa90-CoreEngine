@@ -87,5 +87,9 @@
   "trophy": {
     "dataSource": null,
     "public": false
+  },
+  "team": {
+    "dataSource": "mongoDs",
+    "public": true
   }
 }

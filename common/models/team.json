@@ -1,26 +1,28 @@
 {
-  "name": "verification",
-  "base": "Model",
+  "name": "team",
+  "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true
   },
   "properties": {
-    "phoneNumber": {
+    "name": {
       "type": "string",
-      "required": false
+      "required": true
     },
-    "verificationNumber": {
+    "code": {
       "type": "string",
-      "required": false
-    },
-    "status": {
-      "type": "string",
-      "required": false
+      "required": true
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "clients": {
+      "type": "hasMany",
+      "model": "client",
+      "foreignKey": "id"
+    }
+  },
   "acls": [
     {
       "principalType": "ROLE",
@@ -38,18 +40,6 @@
       "principalType": "ROLE",
       "principalId": "admin",
       "permission": "ALLOW"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$everyone",
-      "permission": "ALLOW",
-      "property": "sendVerification"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$everyone",
-      "permission": "ALLOW",
-      "property": "verification"
     }
   ],
   "methods": {}
