@@ -1,3 +1,5 @@
+var utility	= require('../../public/utility')
+
 var statusConfig = require('../../config/verificationStatus.json')
 
 var request = require('request')
@@ -30,6 +32,17 @@ function postRequest (url, body, callback) {
 	})
 }
 
+function getRequest(url, callback) {
+  request.get(url)
+    .on('data', function (data) {
+      callback(null, JSON.parse(data))
+    })
+    .on('error', function (err) {
+      console.log(err)
+      callback(err, null)
+    })
+}
+
 module.exports = function(verification) {
 
 	var baseURL = 'https://api.kavenegar.com/v1/@/verify/lookup.json'
@@ -49,15 +62,16 @@ module.exports = function(verification) {
 		return Math.floor(Math.random() * (max - min)) + min
 	}
 
-	function sendSMS(phoneNumber, callback) {
-		var rand = getRandomInt(1250, 9999)
+	function sendSMS(phoneNumber, randNumb, callback) {
 		var data = {
 			'receptor': phoneNumber,
-			'token': rand,
+			'token': sendVerificationAlgorithm,
 			'template': 'VerificationNo1'
 		}
 
-		postRequest(begURL, data, function(err, result) {
+		var url = begURL + '?' + utility.generateQueryString(data)
+
+		getRequest(url, function(err, result) {
 			if (err)
 				return callback(err, null)
 			return callback(null, result)
@@ -83,7 +97,7 @@ module.exports = function(verification) {
 				createVerification(phoneNumber, verification, function(err, result) {
 					if (err)
 						return callback(err, null)
-					sendSMS(phoneNumber, function(err, result) {
+					sendSMS(phoneNumber, verification, function(err, result) {
 						if (err)
 							return callback(err, null)
 						return callback(null, result)
@@ -96,7 +110,7 @@ module.exports = function(verification) {
 				result.updateAttribute('verificationNumber', verification, function(err, result) {
 					if (err)
 						return callback(err, null)
-					sendSMS(phoneNumber, function(err, result) {
+					sendSMS(phoneNumber, verification, function(err, result) {
 						if (err)
 							return callback(err, null)
 						return callback(null, result)
@@ -135,7 +149,12 @@ module.exports = function(verification) {
 	}
 
   verification.sendVerification = function (phoneNumber, cb) {
-
+		var rand = getRandomInt(1250, 9999)
+		sendVerificationAlgorithm(phoneNumber, rand, function(err, response) {
+			if (err)
+				return callback(err, null)
+			return callback(null, response)
+		})
   }
 
   verification.remoteMethod('sendVerification', {
@@ -160,7 +179,11 @@ module.exports = function(verification) {
   })
 
   verification.verification = function (phoneNumber, verifyNumber, cb) {
-
+		doVerificationAlgorithm(phoneNumber, verifyNumber, function(err, response) {
+			if (err)
+				return callback(err, null)
+			return callback(null, response)			
+		})
   }
 
   verification.remoteMethod('verification', {
