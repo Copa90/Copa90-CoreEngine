@@ -200,7 +200,7 @@ module.exports = function(verification) {
         source: 'query'
       },
     }],
-    description: 'send verification sms to user',
+    description: 'verify user phone number by sent verification number',
     http: {
       path: '/verification/:phoneNumber/:verifyNumber',
       verb: 'POST',
@@ -236,7 +236,7 @@ module.exports = function(verification) {
         source: 'query'
       },
     }],
-    description: 'send verification sms to user',
+    description: 'check user verification latest status',
     http: {
       path: '/checkUserVerification/:phoneNumber',
       verb: 'GET',

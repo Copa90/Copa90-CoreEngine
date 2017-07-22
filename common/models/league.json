@@ -17,6 +17,11 @@
       "type": "hasMany",
       "model": "predict",
       "foreignKey": "predictId"
+    },
+    "teams": {
+      "type": "hasMany",
+      "model": "team",
+      "foreignKey": "leagueId"
     }
   },
   "acls": [
