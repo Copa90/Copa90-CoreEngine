@@ -2,6 +2,8 @@ var app = require('../../server/server')
 
 module.exports = function(team) {
 
+  team.validatesUniquenessOf('code', {message: 'code is not unique'});
+
   team.selectFavorite = function (ctx, clientId, teamId, cb) {
 		var client = app.models.client
 		client.findById(clientId, function(err, clientInst) {
