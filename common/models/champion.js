@@ -1,9 +1,44 @@
+var cron = require('cron')
 var app = require('../../server/server')
 var roleManager = require('../../public/roleManager')
 
 var utility	= require('../../public/utility')
 
 module.exports = function(champion) {
+
+	var hitRateCalculator = cron.job("0 */5 * * * *", function () {
+		var time = utility.getUnixTimeStamp()
+		champion.find(function(err, championsList) {
+			if (err)
+				return console.error(err)
+			for (var i = 0; i < championsList.length; i++) {
+				var championInst = championsList[i]
+				var ranking = app.models.ranking
+				ranking.find({where:{'leagueId': champion.id}}, function(err, rankingList) {
+					if (err)
+						return console.error(err)
+					var totalPoint = 0
+					var totalPerson = 0
+					var personList = []
+					for (var j = 0; j < rankingList.length; j++) {
+						totalPoint += rankingList[j].points
+						if (totalPerson.indexOf(rankingList[j].clientId) <= -1)
+							totalPerson.push(rankingList[j].clientId)
+					}
+					totalPerson = personList.length
+					var period = time - champion.beginningTime
+					
+					var hitRate = totalPoint / (period * totalPerson) * 1000000
+					championInst.updateAttribute('hitRate', hitRate, function(err, result) {
+						if (err)
+							return console.error(err)
+					})
+				})
+			}
+		})
+	})
+
+	hitRateCalculator.start()
 
 	champion.beforeRemote('create', function (ctx, modelInstance, next) {
 		var time = utility.getUnixTimeStamp()
