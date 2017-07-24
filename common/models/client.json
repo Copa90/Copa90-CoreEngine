@@ -26,10 +26,6 @@
       "required": true,
       "index": true
     },
-    "status": {
-      "type": "string",
-      "required": false
-    },
     "time": {
       "type": "number",
       "required": true,
@@ -77,6 +73,11 @@
       "model": "challenge",
       "foreignKey": "clientId",
       "through": "competition"
+    },
+    "trophies": {
+      "type": "hasMany",
+      "model": "trophy",
+      "foreignKey": "clientId"
     }
   },
   "acls": [
