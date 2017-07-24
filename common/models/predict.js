@@ -33,12 +33,26 @@ module.exports = function(predict) {
 									if (err)
 										return cb(err)
 									for (var j = 0; j < rankingList.length; j++) {
-										var innerPoints = rankingList[i].points + predictInstance.point
-										rankingList[i].updateAttribute('points', innerPoints, function(err, res) {
+										var innerPoints = rankingList[j].points + predictInstance.point
+										rankingList[j].updateAttribute('points', innerPoints, function(err, res) {
 											if (err)
 												return cb(err)
-											if (i == estimateList.length)
-												return cb(null)											
+											if (j == rankingList.length) {
+												var competition = app.models.competition
+												competition.find({'where':{'clientId': clientInst.id}}, function(err, competitionList) {
+													if (err)
+														return cb(err)
+													for (var j = 0; j < competitionList.length; j++) {
+														var innerPoints = competitionList[j].points + predictInstance.point
+														competitionList[j].updateAttribute('points', innerPoints, function(err, res) {
+															if (err)
+																return cb(err)
+															if (i == estimateList.length)
+																return cb(null)											
+														})
+													}
+												})
+											}
 										})
 									}
 								})
