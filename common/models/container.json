@@ -9,7 +9,7 @@
   "validations": [],
   "relations": {},
   "acls": [
-{
+    {
       "principalType": "ROLE",
       "principalId": "$everyone",
       "permission": "DENY"

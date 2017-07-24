@@ -95,5 +95,9 @@
   "container": {
     "dataSource": "fileStorage",
     "public": true
+  },
+  "sequencer": {
+    "dataSource": "mongoDs",
+    "public": true
   }
 }
