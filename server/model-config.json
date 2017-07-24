@@ -91,5 +91,9 @@
   "team": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "container": {
+    "dataSource": "fileStorage",
+    "public": true
   }
 }

@@ -66,6 +66,21 @@ module.exports = function(client) {
     })
   })
 
+  client.afterRemote('create', function (ctx, modelInstance, next) {
+    var option = {}
+    option.name = '' + modelInstance.id
+    var container = app.models.container
+    container.createContainer(option, function (err, container) {
+      if (err)
+        return next(err)
+      container.uploadSampleProImage(modelInstance.id, function(err, result) {
+        if (err)
+          return next(err)
+        return next()        
+      })
+    })
+  })
+
   client.beforeRemote('prototype.__update__accountInfo', function (ctx, modelInstance, next) {
     if (!ctx.args.options.accessToken)
       return next()

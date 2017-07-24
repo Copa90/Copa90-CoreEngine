@@ -38,7 +38,7 @@
     "tags": {
       "type": "array",
       "required": true
-    },    
+    },
     "occurrence": {
       "type": "number",
       "required": false,
