@@ -52,6 +52,16 @@
         "persistent": true
       }
     },
+    "sequencer": {
+      "type": "embedsOne",
+      "model": "sequencer",
+      "property": "sequencerModel",
+      "options": {
+        "validate": true,
+        "forceId": true,
+        "persistent": true
+      }
+    },
     "transactions": {
       "type": "hasMany",
       "model": "transaction",
@@ -141,6 +151,12 @@
       "permission": "ALLOW",
       "property": "__findById__challenges"
     },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "nextObject"
+    },   
     {
       "accessType": "*",
       "principalType": "ROLE",

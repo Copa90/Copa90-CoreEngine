@@ -47,8 +47,14 @@ module.exports = function(predict) {
 														competitionList[j].updateAttribute('points', innerPoints, function(err, res) {
 															if (err)
 																return cb(err)
-															if (i == estimateList.length)
-																return cb(null)											
+															if (i == estimateList.length) {
+																var sequencer = app.models.sequencer
+																sequencer.resetAll(function(err, result) {
+																	if (err)
+																		return cb(err)
+																	return cb(null)
+																})
+															}
 														})
 													}
 												})

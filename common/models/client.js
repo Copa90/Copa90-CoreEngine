@@ -56,6 +56,8 @@ module.exports = function(client) {
         ctx.args.data.emailVerified = true
         ctx.args.data.status        = userStatus.available
         ctx.args.data.email 				= ctx.args.data.email.toLowerCase()
+        ctx.args.data.sequencerModel = {}
+        ctx.args.data.sequencerModel.counter = {}
         ctx.args.data.accountInfo 	= {}
         ctx.args.data.accountInfo.chances 		= 0
         ctx.args.data.accountInfo.roundWins 	= 0
@@ -193,4 +195,73 @@ module.exports = function(client) {
   })
 
 
+  client.nextObject = function (ctx, clientId, leagueId, callback) {
+    if (!ctx.req.accessToken)
+      return callback(new Error('AccessToken Required'))
+
+    if (ctx.req.accessToken.userId !== championInst.creatorId)
+      return callback(new Error('Owner Error'))
+
+    client.findById(clientId, function(err, clientInst) {
+      var index = 0
+      if (clientInst.sequencerModel.counter[leagueId])
+        index = clientInst.sequencerModel.counter[leagueId]
+      clientInst.sequencerModel.counter[leagueId] = index
+      var league = app.models.league
+      league.findById(leagueId, function(err, leagueInst) {
+        if (err)
+          return callback(err)
+        leagueInst.predicts(function(err, predictsList) {
+          if (err)
+            return callback(err)
+          if (index >= predictsList.length)
+            return callback(new Error('end of predication list of this league'))
+          var nextPredict = predictsList[index]
+          clientInst.sequencerModel.counter[leagueId] += 1
+          clientInst.sequencer.update({'counter': clientInst.sequencerModel.counter}, function(err, result) {
+            if (err)
+              return callback(err)
+            return callback(null, nextPredict)
+          })
+        })
+      })
+		})
+  }
+
+  client.remoteMethod('nextObject', {
+    description: 'join to a particular champion',
+    accepts: [{
+        arg: 'ctx',
+        type: 'object',
+        http: {
+          source: 'context'
+        }
+      }, {
+        arg: 'clientId',
+        type: 'string',
+        required: true,
+        http: {
+          source: 'query'
+        }
+      }, {
+        arg: 'leagueId',
+        type: 'string',
+        required: true,
+        http: {
+          source: 'query'
+        }
+      }
+    ],
+    http: {
+      path: '/:clientId/nextObject/:leagueId',
+      verb: 'GET',
+      status: 200,
+      errorStatus: 400
+    },
+    returns: {
+			type: 'string',
+			root: true
+    }
+  })
+  
 }
