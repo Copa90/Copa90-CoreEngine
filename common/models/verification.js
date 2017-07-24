@@ -192,13 +192,13 @@ module.exports = function(verification) {
       type: 'string',
       http: {
         source: 'query'
-      },
+      }
     }, {
       arg: 'verifyNumber',
       type: 'string',
       http: {
         source: 'query'
-      },
+      }
     }],
     description: 'verify user phone number by sent verification number',
     http: {
@@ -234,7 +234,7 @@ module.exports = function(verification) {
       type: 'string',
       http: {
         source: 'query'
-      },
+      }
     }],
     description: 'check user verification latest status',
     http: {
