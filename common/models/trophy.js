@@ -29,6 +29,39 @@ module.exports = function (trophy) {
 
   }
 
+  trophy.remoteMethod('leagueRanking', {
+    accepts: [{
+      arg: 'imageName',
+      type: 'string',
+      http: {
+        source: 'query'
+      }
+    }, {
+      arg: 'username',
+      type: 'string',
+      http: {
+        source: 'query'
+      }
+    }, {
+      arg: 'rankings',
+      type: 'object',
+      http: {
+        source: 'query'
+      }
+    }],
+    description: 'send user league ranking trophy image cards',
+    http: {
+      path: '/leagueRanking',
+      verb: 'GET',
+      status: 200,
+      errorStatus: 400
+    },
+    returns: {
+      type: 'Boolean',
+      root: true
+    }
+  })
+
 	var infoColor = 'e_colorize,co_rgb:212121'
 	var nameColor = 'e_colorize,co_rgb:313131'
 
@@ -40,5 +73,38 @@ module.exports = function (trophy) {
 		var str = baseURL
 
   }
+
+  trophy.remoteMethod('userStats', {
+    accepts: [{
+      arg: 'imageName',
+      type: 'string',
+      http: {
+        source: 'query'
+      }
+    }, {
+      arg: 'username',
+      type: 'string',
+      http: {
+        source: 'query'
+      }
+    }, {
+      arg: 'information',
+      type: 'string',
+      http: {
+        source: 'query'
+      }
+    }],
+    description: 'send user statistics trophy image cards',
+    http: {
+      path: '/userStats',
+      verb: 'GET',
+      status: 200,
+      errorStatus: 400
+    },
+    returns: {
+      type: 'Boolean',
+      root: true
+    }
+  })
 
 }
