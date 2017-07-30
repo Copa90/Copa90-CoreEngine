@@ -68,21 +68,37 @@ module.exports = function(client) {
         return next(err)
       if (!result)
         return next(new Error('Not Verified Yet!'))
-      var whiteList = ['status', 'email', 'username', 'password', 'time', 'phoneNumber', 'fullname']
+      var whiteList = ['status', 'email', 'username', 'password', 'time', 'phoneNumber', 'fullname', 'referrer']
       if (!utility.inputChecker(ctx.args.data, whiteList))
         return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
       else {
-        ctx.args.data.emailVerified = true
-        ctx.args.data.status        = userStatus.available
-        ctx.args.data.email 				= ctx.args.data.email.toLowerCase()
-        ctx.args.data.sequencerModel = {}
-        ctx.args.data.sequencerModel.counter = {}
-        ctx.args.data.accountInfo 	= {}
-        ctx.args.data.accountInfo.chances 		= 0
-        ctx.args.data.accountInfo.roundWins 	= 0
-        ctx.args.data.accountInfo.totalPoints = 0
-        ctx.args.data.accountInfo.totalEstimates = 0
-        return next()
+        function done() {
+          ctx.args.data.emailVerified = true
+          ctx.args.data.status        = userStatus.available
+          ctx.args.data.email 				= ctx.args.data.email.toLowerCase()
+          ctx.args.data.sequencerModel = {}
+          ctx.args.data.sequencerModel.counter = {}
+          ctx.args.data.accountInfoModel 	= {}
+          ctx.args.data.accountInfoModel.chances 		    = 10
+          ctx.args.data.accountInfoModel.roundWins 	    = 0
+          ctx.args.data.accountInfoModel.totalPoints    = 0
+          ctx.args.data.accountInfoModel.totalEstimates = 0
+          ctx.args.data.referralModel = {}
+          ctx.args.data.referralModel.clients = []
+          ctx.args.data.trophyModel 	= {}
+          ctx.args.data.trophyModel.time    = ctx.args.data.time
+          ctx.args.data.trophyModel.level   = 0
+          return next()
+        }
+        if (ctx.args.data.referrer) {
+          client.findById(ctx.args.data.referrer, function(err, result) {
+            if (err)
+              return next(new Error('Referrer Does not Exists'))
+            done()
+          })
+        } else {
+          done()
+        }
       }
     })
   })
@@ -139,13 +155,13 @@ module.exports = function(client) {
       if (err)
         return next(err)
 			if (ctx.args.data.chances)
-				ctx.args.data.chances 		+= result.accountInfo.chances
+				ctx.args.data.chances 		+= result.accountInfoModel.chances
 			if (ctx.args.data.roundWins)
-				ctx.args.data.roundWins 	+= result.accountInfo.roundWins
+				ctx.args.data.roundWins 	+= result.accountInfoModel.roundWins
 			if (ctx.args.data.totalPoints)
-        ctx.args.data.totalPoints += result.accountInfo.totalPoints	
+        ctx.args.data.totalPoints += result.accountInfoModel.totalPoints	
 			if (ctx.args.data.totalEstimates)
-        ctx.args.data.totalEstimates += result.accountInfo.totalEstimates	      		
+        ctx.args.data.totalEstimates += result.accountInfoModel.totalEstimates	      		
       return next()
     })
   })
