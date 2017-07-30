@@ -3,9 +3,22 @@ var app = require('../../server/server')
 
 var utility	= require('../../public/utility')
 var statusConfig = require('../../config/predictStatus.json')
+var tagConfig = require('../../config/predictTags.json')
 var estimateStatusConfig = require('../../config/estimateStatus.json')
 
 module.exports = function(predict) {
+
+  var statusList = []
+  for (var key in statusConfig) 
+    statusList.push(statusConfig[key])
+
+	predict.validatesInclusionOf('status', {in: statusList})
+
+  var tagsList = []
+  for (var key in tagConfig) 
+    tagsList.push(tagConfig[key])
+
+	predict.validatesInclusionOf('tag', {in: tagsList})
 
 	function finishPredict(predictInstance, cb) {
 		predictInstance.estimates({'status': estimateStatusConfig.open}, function(err, estimateList) {
