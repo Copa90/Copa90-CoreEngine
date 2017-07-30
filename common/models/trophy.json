@@ -1,6 +1,6 @@
 {
   "name": "trophy",
-  "base": "PersistedModel",
+  "base": "Model",
   "idInjection": true,
   "options": {
     "validateUpsert": true
@@ -10,19 +10,13 @@
       "type": "number",
       "required": true
     },
-    "type": {
-      "type": "string",
+    "level": {
+      "type": "number",
       "required": true
     }
   },
   "validations": [],
-  "relations": {
-    "clientRel": {
-      "type": "belongsTo",
-      "model": "client",
-      "foreignKey": "clientId"
-    }
-  },
+  "relations": {},
   "acls": [
     {
       "principalType": "ROLE",

@@ -1,3 +1,5 @@
+var utility	= require('../../public/utility')
+
 var request = require('request')
 
 function getRequest(url, callback) {
@@ -12,6 +14,27 @@ function getRequest(url, callback) {
 }
 
 module.exports = function (trophy) {
+
+  trophy.trophyCheck = function (clientInst, cb) {
+    var badgeArray = [0, 150, 300, 500, 1000, 200, 4000, 8000, 15000, 25000, 50000]
+    var totalPoints = clientInst.accountInfoModel.totalPoints
+    if (clientInst.trophyModel.level + 1 < badgeArray.length) {
+      if (totalPoints > badgeArray[clientInst.trophyModel.level + 1]) {
+        var data = {
+          'time': utility.getUnixTimeStamp(),
+          'level': clientInst.trophyModel.level + 1
+        }
+        clientInst.trophy.update(data, function(err, result) {
+          if (err)
+            return cb(err)
+          return cb(null, 'successful')
+        })
+      }
+      else {
+        return cb(null, 'no need')
+      }
+    }
+  }
 
 	var baseURL = 'http://res.cloudinary.com/dqyiaeoz1/image/upload'
 
