@@ -20,14 +20,36 @@ module.exports = function(transaction) {
 			package.findById(ctx.args.data.packageId, function(err, packageInst) {
 				if (err)
 					return next(err)
-				var newChances = client.accountInfoModel.chances + packageInst.chances
-				clientInst.accountInfo.update({'chances': newChances}, function(err, instance) {
-					if (err)
-						return next(err)
-					modelInstance.clientRel(clientInst)
-					modelInstance.packageRel(packageInst)
-					return next()					
-				})
+				modelInstance.clientRel(clientInst)
+				modelInstance.packageRel(packageInst)
+				if (modelInstance.status === statusConfig.successful) {
+					var newChances = client.accountInfoModel.chances + packageInst.chances
+					clientInst.accountInfo.update({'chances': newChances}, function(err, instance) {
+						if (err)
+							return next(err)
+						transaction.find({where:{'clientId': clientInst.id, 'status': statusConfig.successful}}, function(err, transactionList) {
+							if (err)
+								return next(err)
+							if (transactionList.length == 1 && clientInst.referrer) {
+								client.findById(clientInst.referrer, function(err, referrerInst) {
+									if (err)
+										return next(err)
+									var newReferrerChances = referrerInst.accountInfoModel.chances + 5
+									clientInst.accountInfo.update({'chances': newReferrerChances}, function(err, result) {
+										if (err)
+											return next(err)
+										return next()
+									})
+								})
+							} else {
+								return next()
+							}
+						})
+					})
+				}
+				else {
+					return next()
+				}
 			})
 		})
 	})
