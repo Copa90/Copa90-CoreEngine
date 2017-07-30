@@ -117,13 +117,9 @@ module.exports = function(predict) {
 				console.error(err)
 			for (var i = 0; i < predictList.length; i++) {
 				if (predictList[i].endingTime <= time) {
-					predictList[i].updateAttribute('status', statusConfig.finished, function (err, predictInst) {
+					predictList[i].updateAttribute('status', statusConfig.closed, function (err, predictInst) {
 						if (err)
 							console.error(err)
-						finishPredict(predictInst, function(err, result) {
-							if (err)
-								console.error(err)
-						})
 					})
 				}
 			}
@@ -144,7 +140,7 @@ module.exports = function(predict) {
 	})
 
   predict.afterRemote('replaceById', function (ctx, modelInstance, next) {
-		if (ctx.args.data.status === statusConfig.working && (ctx.args.data.occurrence && ctx.args.data.occurrence != 0)) {
+		if ((modelInstance.status === statusConfig.working || modelInstance.status === statusConfig.closed) && (modelInstance.occurrence && modelInstance.occurrence != 0)) {
 			var client = app.models.client
 			modelInstance.updateAttribute('status', statusConfig.finished, function(err, predictInstance) {
 				if (err)
