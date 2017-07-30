@@ -35,9 +35,10 @@
       "required": false,
       "default": "Created"
     },
-    "tags": {
-      "type": "array",
-      "required": true
+    "tag": {
+      "type": "string",
+      "required": false,
+      "default": "Week"
     },
     "occurrence": {
       "type": "number",
