@@ -61,8 +61,8 @@ module.exports = function(predict) {
 															if (err)
 																return cb(err)
 															if (i == estimateList.length) {
-																var sequencer = app.models.sequencer
-																sequencer.resetAll(function(err, result) {
+																var trophy = app.models.trophy
+																trophy.trophyCheck(clientInst, function(err, result) {
 																	if (err)
 																		return cb(err)
 																	return cb(null)
