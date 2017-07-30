@@ -97,7 +97,37 @@ module.exports = function(client) {
       container.uploadSampleProImage(modelInstance.id, function(err, result) {
         if (err)
           return next(err)
-        return next()        
+        if (modelInstance.referrer) {
+          client.findById(modelInstance.referrer, function(err, referrerInst) {
+            if (err)
+              return next(err)
+            if (referrerInst.referralModel.clients.length >= 0) {
+              return next()
+            }
+            else {
+              var newClients = []
+              newClients = referrerInst.referralModel.clients
+              newClients.push(modelInstance.id)
+              referrerInst.referral.update({'clients': newClients}, function(err, result) {
+                if (err)
+                  return next(err)
+                var newReferrerChances = referrerInst.accountInfoModel.chances + 5
+                referrerInst.accountInfo.update({'chances': newReferrerChances}, function(err, result) {
+                  if (err)
+                    return next(err)
+                  var newModelInstanceChances = referrerInst.accountInfoModel.chances + 5
+                  modelInstance.accountInfo.update({'chances': newModelInstanceChances}, function(err, result) {
+                    if (err)
+                      return next(err)
+                    return next()
+                  })
+                })
+              })
+            }
+          })
+        } else {
+          return next()
+        }
       })
     })
   })
