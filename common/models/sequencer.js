@@ -17,4 +17,20 @@ module.exports = function(sequencer) {
 			}
 		})
 	}
+
+  sequencer.remoteMethod('resetAll', {
+    accepts: [],
+    description: 'reset all users sequences counters',
+    http: {
+      path: '/resetAll',
+      verb: 'POST',
+      status: 200,
+      errorStatus: 400
+    },
+    returns: {
+      type: 'string',
+      root: true
+    }
+  })
+
 }
