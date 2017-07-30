@@ -38,6 +38,10 @@
     "fullname": {
       "type": "string",
       "required": true
+    },
+    "referrer": {
+      "type": "string",
+      "required": false
     }
   },
   "validations": [],
@@ -56,6 +60,26 @@
       "type": "embedsOne",
       "model": "sequencer",
       "property": "sequencerModel",
+      "options": {
+        "validate": true,
+        "forceId": true,
+        "persistent": true
+      }
+    },
+    "referrals": {
+      "type": "embedsOne",
+      "model": "referral",
+      "property": "referralModel",
+      "options": {
+        "validate": true,
+        "forceId": true,
+        "persistent": true
+      }
+    },
+    "trophy": {
+      "type": "embedsOne",
+      "model": "trophy",
+      "property": "trophyModel",
       "options": {
         "validate": true,
         "forceId": true,
@@ -83,11 +107,6 @@
       "model": "challenge",
       "foreignKey": "clientId",
       "through": "competition"
-    },
-    "trophies": {
-      "type": "hasMany",
-      "model": "trophy",
-      "foreignKey": "clientId"
     }
   },
   "acls": [
@@ -156,7 +175,7 @@
       "principalId": "$authenticated",
       "permission": "ALLOW",
       "property": "nextObject"
-    },   
+    },
     {
       "accessType": "*",
       "principalType": "ROLE",
