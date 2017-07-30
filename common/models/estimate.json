@@ -18,7 +18,7 @@
     "status": {
       "type": "string",
       "required": false,
-      "default": "Unknown"
+      "default": "Open"
     }
   },
   "validations": [],
