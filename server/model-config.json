@@ -99,5 +99,9 @@
   "sequencer": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "referral": {
+    "dataSource": "mongoDs",
+    "public": true
   }
 }
