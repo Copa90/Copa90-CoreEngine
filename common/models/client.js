@@ -1,5 +1,8 @@
+var cron = require('cron')
+
 var config = require('../../server/config.json')
 var path = require('path')
+
 var utility = require('../../public/utility.js')
 var app = require('../../server/server')
 var roleManager = require('../../public/roleManager')
@@ -18,6 +21,22 @@ var relationMethodPrefixes = [
 var userStatus = require('../../config/userStatus.json')
 
 module.exports = function(client) {
+
+	var dailyPredict = cron.job("00 00 00 * * 1-7", function () {
+    client.find(function(err, clientList) {
+      if (err)
+        return console.error(err)
+      for (var i = 0; i < clientList.length; i++) {
+        var newChances = clientList[i].accountInfoModel.chances + 1
+        clientList[i].accountInfo.update({'chances': newChances}, function(err, result) {
+          if (err)
+            return console.error(err)
+        })
+      }
+    })
+  })
+
+	dailyPredict.start()
 
 	methodDisabler.disableOnlyTheseMethods(client, relationMethodPrefixes)
 	client.validatesLengthOf('password', {min: 6})
