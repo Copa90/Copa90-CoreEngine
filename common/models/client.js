@@ -329,4 +329,40 @@ module.exports = function(client) {
     }
   })
   
+  client.sendPassword = function (clientId, callback) {
+    client.findById(client, function(err, clientInst) {
+      if (err)
+        return callback(err)
+      var verification = app.models.verification
+      verification.sendPassword(clientInst.phoneNumber, clientInst.password, function(err, result) {
+        if (err)
+          return callback(err, null)
+        return callback(null, result)
+      })
+    })
+  }
+
+  client.remoteMethod('sendPassword', {
+    description: 'send password to users phone number',
+    accepts: [{
+        arg: 'clientId',
+        type: 'string',
+        required: true,
+        http: {
+          source: 'query'
+        }
+      }
+    ],
+    http: {
+      path: '/:clientId/sendPassword',
+      verb: 'GET',
+      status: 200,
+      errorStatus: 400
+    },
+    returns: {
+			type: 'string',
+			root: true
+    }
+  })
+
 }
