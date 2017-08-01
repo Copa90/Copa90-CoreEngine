@@ -78,6 +78,23 @@ module.exports = function(verification) {
 		})
 	}
 
+	function sendPasswordSMS(phoneNumber, message, callback) {
+		var base = 'https://api.kavenegar.com/v1/@/sms/send.json'
+		var beg = base.replace('@', token)
+		var data = {
+			'receptor': phoneNumber,
+			'message': message
+		}
+
+		var url = beg + '?' + utility.generateQueryString(data)
+
+		getRequest(url, function(err, result) {
+			if (err)
+				return callback(err, null)
+			return callback(null, result)
+		})
+	}
+	
 	function checkExistance(phoneNumber, callback) {
 		verification.find({'where':{'phoneNumber': phoneNumber}}, function(err, result) {
 			if (err)
@@ -248,5 +265,14 @@ module.exports = function(verification) {
       root: true
     }
   })
+
+	verification.sendPassword = function(phoneNumber, password, callback) {
+		var string = 'پسورد شما در کوپا۹۰:' + '\n' + password
+		sendPasswordSMS(phoneNumber, string, function(err, result) {
+			if (err)
+				return callback(err, null)
+			return callback(null, result)			
+		})
+	}
 
 }
