@@ -86,6 +86,16 @@
         "persistent": true
       }
     },
+    "checkpoint": {
+      "type": "embedsOne",
+      "model": "checkpoint",
+      "property": "checkpointModel",
+      "options": {
+        "validate": true,
+        "forceId": true,
+        "persistent": true
+      }
+    },
     "transactions": {
       "type": "hasMany",
       "model": "transaction",
