@@ -52,7 +52,16 @@ module.exports = function(client) {
       ctx.args.credentials.email 	= ctx.args.credentials.email.toLowerCase()
       ctx.req.body.email 					= ctx.req.body.email.toLowerCase()
     }
-    return next()
+    client.find({where:{phoneNumber: ctx.args.credentials.phoneNumber}}, function(err, results) {
+      if (err)
+        return next(err)
+      if (results.length == 0)
+        return next(new Error('client does not exists'))
+      var clientInst = results[0]
+      ctx.args.credentials.email 	= clientInst.email.toLowerCase()
+      ctx.req.body.email 					= clientInst.email.toLowerCase()
+      return next()
+    })
   })
 
   client.beforeRemote('create', function (ctx, modelInstance, next) {
