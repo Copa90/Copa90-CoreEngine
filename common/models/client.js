@@ -77,7 +77,7 @@ module.exports = function(client) {
         return next(err)
       if (!result)
         return next(new Error('Not Verified Yet!'))
-      var whiteList = ['status', 'email', 'username', 'password', 'time', 'phoneNumber', 'fullname', 'referrer']
+      var whiteList = ['email', 'username', 'password', 'time', 'phoneNumber', 'fullname', 'referrer']
       if (!utility.inputChecker(ctx.args.data, whiteList))
         return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
       else {
@@ -97,6 +97,8 @@ module.exports = function(client) {
           ctx.args.data.trophyModel 	= {}
           ctx.args.data.trophyModel.time    = ctx.args.data.time
           ctx.args.data.trophyModel.level   = 0
+          ctx.args.data.checkpointModel = {}
+          ctx.args.data.checkpointModel.leagues = {}
           return next()
         }
         if (ctx.args.data.referrer) {
