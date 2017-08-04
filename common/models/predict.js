@@ -41,39 +41,47 @@ module.exports = function(predict) {
 							clientInst.accountInfo.update({'roundWins': newRoundWins, 'totalPoints': newTotalPoints}, function(err, accountInst) {
 								if (err)
 									return cb(err)
-								var ranking = app.models.ranking
-								ranking.find({'where':{'clientId': clientInst.id}}, function(err, rankingList) {
+								var leaguePoint = 0
+								if (clientInst.checkpointModel.leagues[predictInstance.leagueId]) 
+									leaguePoint = clientInst.checkpointModel.leagues[predictInstance.leagueId]
+								clientInst.checkpointModel.leagues[predictInstance.leagueId] = leaguePoint + predictInstance.point
+								clientInst.checkpoint.update({'leagues': clientInst.checkpointModel.leagues}, function(err, result) {
 									if (err)
 										return cb(err)
-									for (var j = 0; j < rankingList.length; j++) {
-										var innerPoints = rankingList[j].points + predictInstance.point
-										rankingList[j].updateAttribute('points', innerPoints, function(err, res) {
-											if (err)
-												return cb(err)
-											if (j == rankingList.length) {
-												var competition = app.models.competition
-												competition.find({'where':{'clientId': clientInst.id}}, function(err, competitionList) {
-													if (err)
-														return cb(err)
-													for (var j = 0; j < competitionList.length; j++) {
-														var innerPoints = competitionList[j].points + predictInstance.point
-														competitionList[j].updateAttribute('points', innerPoints, function(err, res) {
-															if (err)
-																return cb(err)
-															if (i == estimateList.length) {
-																var trophy = app.models.trophy
-																trophy.trophyCheck(clientInst, function(err, result) {
-																	if (err)
-																		return cb(err)
-																	return cb(null)
-																})
-															}
-														})
-													}
-												})
-											}
-										})
-									}
+									var ranking = app.models.ranking
+									ranking.find({'where':{'clientId': clientInst.id}}, function(err, rankingList) {
+										if (err)
+											return cb(err)
+										for (var j = 0; j < rankingList.length; j++) {
+											var innerPoints = rankingList[j].points + predictInstance.point
+											rankingList[j].updateAttribute('points', innerPoints, function(err, res) {
+												if (err)
+													return cb(err)
+												if (j == rankingList.length) {
+													var competition = app.models.competition
+													competition.find({'where':{'clientId': clientInst.id}}, function(err, competitionList) {
+														if (err)
+															return cb(err)
+														for (var j = 0; j < competitionList.length; j++) {
+															var innerPoints = competitionList[j].points + predictInstance.point
+															competitionList[j].updateAttribute('points', innerPoints, function(err, res) {
+																if (err)
+																	return cb(err)
+																if (i == estimateList.length) {
+																	var trophy = app.models.trophy
+																	trophy.trophyCheck(clientInst, function(err, result) {
+																		if (err)
+																			return cb(err)
+																		return cb(null)
+																	})
+																}
+															})
+														}
+													})
+												}
+											})
+										}
+									})
 								})
 							})
 						})
