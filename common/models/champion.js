@@ -273,4 +273,62 @@ module.exports = function(champion) {
 			root: true
     }
 	})
+	
+  champion.leaveChampion = function (ctx, championId, clientId, callback) {
+		champion.findById(championId, function(err, championInst) {
+			if (err)
+				return callback(err)
+			if (ctx.req.accessToken.userId === clientId)
+				return callback(new Error('Owner Can not left'))
+			var client = app.models.client
+			client.findById(clientId, function(err, clientInst) {
+				if (err)
+					return callback(err)
+				championInst.clients.remove(clientInst, function(err, result) {
+					if (err)
+						return callback(err)
+					return callback(null, 'Successfuly Left')	
+				})
+			})
+		})
+  }
+
+  champion.remoteMethod('leaveChampion', {
+    description: 'user left from a particular champion',
+    accepts: [{
+        arg: 'ctx',
+        type: 'object',
+        http: {
+          source: 'context'
+        }
+      },
+      {
+        arg: 'championId',
+        type: 'string',
+        required: true,
+        http: {
+          source: 'query'
+        }
+      },
+      {
+        arg: 'clientId',
+        type: 'string',
+        required: true,
+        http: {
+          source: 'query'
+        }
+      }
+    ],
+    http: {
+      path: '/:championId/leaveChampion/:clientId',
+      verb: 'POST',
+      status: 200,
+      errorStatus: 400
+    },
+    returns: {
+			type: 'string',
+			root: true
+    }
+	})
+
 }

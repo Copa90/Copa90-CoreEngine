@@ -80,6 +80,12 @@
       "principalId": "$authenticated",
       "permission": "ALLOW",
       "property": "kickUser"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "leaveChampion"
     }
   ],
   "methods": {}
