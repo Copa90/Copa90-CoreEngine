@@ -111,7 +111,11 @@ module.exports = function(champion) {
 					clientModel.accountInfo.update({'chances': newChances}, function(err, result) {
 						if (err)
 							return next(err)
-						return next()
+						championModel.clients.destroyAll(function(err, result) {
+							if (err)
+								return next(err)
+							return next()							
+						})
 					})
 				}
 				else 
@@ -149,6 +153,9 @@ module.exports = function(champion) {
 					return callback(err)
 				if (champClientsList.length + 1 > championInst.capacity)
 					return callback(new Error('Capacity is Full'))
+				for (var i = 0; i < champClientsList.length; i++)
+					if (champClientsList[i].id === clientId)
+						return callback(new Error('Already Within'))
 				var client = app.models.client
 				client.findById(clientId, function(err, clientInst) {
 					if (err)
@@ -198,7 +205,7 @@ module.exports = function(champion) {
     ],
     http: {
       path: '/:championId/joinChampion/:clientId',
-      verb: 'GET',
+      verb: 'POST',
       status: 200,
       errorStatus: 400
     },
@@ -257,7 +264,7 @@ module.exports = function(champion) {
     ],
     http: {
       path: '/:championId/kickUser/:clientId',
-      verb: 'GET',
+      verb: 'POST',
       status: 200,
       errorStatus: 400
     },
@@ -265,5 +272,5 @@ module.exports = function(champion) {
 			type: 'string',
 			root: true
     }
-  })
+	})
 }

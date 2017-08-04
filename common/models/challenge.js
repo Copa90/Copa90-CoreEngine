@@ -111,7 +111,11 @@ module.exports = function(challenge) {
 					clientModel.accountInfo.update({'chances': newChances}, function(err, result) {
 						if (err)
 							return next(err)
-						return next()
+						challengeModel.clients.destroyAll(function(err, result) {
+							if (err)
+								return next(err)
+							return next()							
+						})
 					})
 				}
 				else 
@@ -198,7 +202,7 @@ module.exports = function(challenge) {
     ],
     http: {
       path: '/:challengeId/joinChallenge/:clientId',
-      verb: 'GET',
+      verb: 'POST',
       status: 200,
       errorStatus: 400
     },
@@ -255,7 +259,7 @@ module.exports = function(challenge) {
     ],
     http: {
       path: '/:challengeId/leaveChallenge/:clientId',
-      verb: 'GET',
+      verb: 'POST',
       status: 200,
       errorStatus: 400
     },
