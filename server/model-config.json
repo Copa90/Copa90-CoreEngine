@@ -103,5 +103,9 @@
   "referral": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "checkpoint": {
+    "dataSource": "mongoDs",
+    "public": true
   }
 }
