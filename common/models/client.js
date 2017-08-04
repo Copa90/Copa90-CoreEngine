@@ -340,23 +340,29 @@ module.exports = function(client) {
     }
   })
   
-  client.sendPassword = function (clientId, callback) {
-    client.findById(client, function(err, clientInst) {
+  client.sendPassword = function (phoneNumber, callback) {
+    client.find({'where':{'phoneNumber': phoneNumber}}, function(err, clients) {
       if (err)
         return callback(err)
-      var verification = app.models.verification
-      verification.sendPassword(clientInst.phoneNumber, clientInst.password, function(err, result) {
-        if (err)
-          return callback(err, null)
-        return callback(null, result)
-      })
+      if (clients.length == 0) {
+        return callback(new Error('not registered yet'))
+      }
+      else {
+        clientInst = clients[0]
+        var verification = app.models.verification
+        verification.sendPassword(clientInst.phoneNumber, clientInst.password, function(err, result) {
+          if (err)
+            return callback(err, null)
+          return callback(null, result)
+        })
+      }
     })
   }
 
   client.remoteMethod('sendPassword', {
     description: 'send password to users phone number',
     accepts: [{
-        arg: 'clientId',
+        arg: 'phoneNumber',
         type: 'string',
         required: true,
         http: {
@@ -365,7 +371,7 @@ module.exports = function(client) {
       }
     ],
     http: {
-      path: '/:clientId/sendPassword',
+      path: '/sendPassword/:phoneNumber',
       verb: 'GET',
       status: 200,
       errorStatus: 400
