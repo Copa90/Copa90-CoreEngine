@@ -91,7 +91,13 @@ module.exports = function(champion) {
 						return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
 					if (ctx.args.data.capacity < 5)
 						return next(new Error('Capacity Can not be Less than 5!'))
-					return next()
+					championInst.clients(function(err, champClientsList) {
+						if (err)
+							return next(err)
+						if (ctx.args.data.capacity < champClientsList.length)
+							return next(new Error('Capacity Can not be Less than Current Champion Size!'))
+						return next()
+					})
 				})
 			}
 			else 
