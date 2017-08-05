@@ -16,7 +16,7 @@ function getRequest(url, callback) {
 module.exports = function (trophy) {
 
   trophy.trophyCheck = function (clientInst, cb) {
-    var badgeArray = [0, 150, 300, 500, 1000, 200, 4000, 8000, 15000, 25000, 50000]
+    var badgeArray = [0, 150, 300, 500, 1000, 2000, 4000, 8000, 15000, 25000, 50000]
     var totalPoints = clientInst.accountInfoModel.totalPoints
     if (clientInst.trophyModel.level + 1 < badgeArray.length) {
       if (totalPoints > badgeArray[clientInst.trophyModel.level + 1]) {
