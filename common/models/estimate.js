@@ -29,6 +29,7 @@ module.exports = function(estimate) {
 				if (!(time >= predictInst.beginningTime && time <= predictInst.endingTime))
 					return next(new Error('Estimate on This Prediction is Over!'))
 				ctx.args.data.status = statusConfig.open
+				ctx.args.data.point = Number(predictInst.point)
 				return next()	
 			})
 		})
