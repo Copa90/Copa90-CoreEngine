@@ -6,7 +6,7 @@
     "validateUpsert": true
   },
   "properties": {
-    "counter": {
+    "leagues": {
       "type": "object",
       "required": false
     }
