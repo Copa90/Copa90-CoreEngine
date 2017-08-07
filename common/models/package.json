@@ -23,6 +23,11 @@
       "required": true,
       "default": 10
     },
+    "price": {
+      "type": "number",
+      "required": true,
+      "default": 2000
+    },
     "offer": {
       "type": "string",
       "required": false,
