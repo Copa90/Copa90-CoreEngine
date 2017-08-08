@@ -66,6 +66,12 @@
       "principalId": "$everyone",
       "permission": "DENY",
       "property": "delete"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "create"
     }
   ],
   "methods": {}
