@@ -20,7 +20,7 @@
     "clients": {
       "type": "hasMany",
       "model": "client",
-      "foreignKey": "id"
+      "foreignKey": "teamId"
     }
   },
   "acls": [
@@ -43,13 +43,13 @@
     },
     {
       "principalType": "ROLE",
-      "principalId": "$authenticated",
+      "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "find"
     },
     {
       "principalType": "ROLE",
-      "principalId": "$authenticated",
+      "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "selectFavorite"
     },

@@ -7,28 +7,18 @@ module.exports = function (team) {
   });
 
   team.selectFavorite = function (ctx, clientId, teamId, cb) {
-    var client = app.models.client
+		var client = app.models.client
     client.findById(clientId, function (err, clientInst) {
       if (err)
-        return cb(err)
-      if (ctx.req.accessToken.userId !== clientId)
-        return cb(new Error('Owner Error'))
+				return cb(err)
       team.findById(teamId, function (err, teamInst) {
         if (err)
-          return cb(err)
-        teamInst.clients.add(clientInst, function (err, result) {
-          if (err)
-            return cb(err)
-          var model = {
-            teamId: teamId,
-            name: teamInst.name
-          }
-          clientInst.updateAttribute('favTeam', model, function (err, result) {
-            if (err)
-              return cb(err)
-            return cb(result)
-          })
-        })
+					return cb(err)
+				clientInst.updateAttribute('teamId', teamId, function (err, result) {
+					if (err)
+						return cb(err)
+					return cb(null, result)
+				})
       })
     })
   }
@@ -44,13 +34,13 @@ module.exports = function (team) {
       arg: 'clientId',
       type: 'string',
       http: {
-        source: 'query'
+        source: 'path'
       },
     }, {
       arg: 'teamId',
       type: 'string',
       http: {
-        source: 'query'
+        source: 'path'
       },
     }],
     description: 'join a client to a particular favorite team',
@@ -61,7 +51,7 @@ module.exports = function (team) {
       errorStatus: 400
     },
     returns: {
-      type: 'string',
+      type: 'object',
       root: true
     }
   })
