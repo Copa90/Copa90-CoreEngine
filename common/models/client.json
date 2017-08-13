@@ -56,16 +56,6 @@
         "persistent": true
       }
     },
-    "sequencer": {
-      "type": "embedsOne",
-      "model": "sequencer",
-      "property": "sequencerModel",
-      "options": {
-        "validate": true,
-        "forceId": true,
-        "persistent": true
-      }
-    },
     "referrals": {
       "type": "embedsOne",
       "model": "referral",
@@ -191,6 +181,12 @@
       "principalId": "$authenticated",
       "permission": "ALLOW",
       "property": "nextObject"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "find"
     },
     {
       "accessType": "*",
