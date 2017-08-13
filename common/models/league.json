@@ -16,7 +16,7 @@
     "predicts": {
       "type": "hasMany",
       "model": "predict",
-      "foreignKey": "predictId"
+      "foreignKey": "leagueId"
     },
     "teams": {
       "type": "hasMany",
@@ -44,7 +44,7 @@
     },
     {
       "principalType": "ROLE",
-      "principalId": "$authenticated",
+      "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "find"
     }
