@@ -1,6 +1,6 @@
 var utility = require('../../public/utility.js')
 
-var CONTAINERS_URL = '/api/containers/'
+var CONTAINERS_URL = 'containers/'
 
 var fs = require('fs')
 var path = require('path')
@@ -26,11 +26,11 @@ module.exports = function(container) {
 
 	container.uploadSampleProImage = function(clientId, cb) {
 		var size = 200
-		var png = jdenticon.toPng(clientId, size);
+		var png = jdenticon.toPng('' + clientId, size);
 
 		var directory = path.resolve(__dirname + '/../../fileStorage/')
 		var fp = directory + '/' + clientId + '/profile.png'
-		var fileURL = CONTAINERS_URL + clientId + '/download//profile.png'
+		var fileURL = CONTAINERS_URL + clientId + '/download/profile.png'
 
     fs.writeFile(fp, png, function (err) {
       if (err)
@@ -38,9 +38,30 @@ module.exports = function(container) {
 			writeDataInClientModel(clientId, fileURL, function(err, result) {
 				if (err)
 					return cb(err, null)
-				return cb(null, result)
+				return cb(null, 'successfuly added sample image')
 			})
     })
 	}
+
+  container.remoteMethod('uploadSampleProImage', {
+    accepts: [{
+      arg: 'clientId',
+      type: 'string',
+      http: {
+        source: 'path'
+      }
+    }],
+    description: 'upload a sample image with jdenticon',
+    http: {
+      path: '/uploadSampleProImage/:clientId',
+      verb: 'POST',
+      status: 200,
+      errorStatus: 400
+    },
+    returns: {
+      type: 'string',
+      root: true
+    }
+  })
 
 }
