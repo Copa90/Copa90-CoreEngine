@@ -49,7 +49,7 @@
       "principalType": "ROLE",
       "principalId": "$everyone",
       "permission": "ALLOW",
-      "property": "verification"
+      "property": "verify"
     }
   ],
   "methods": {}

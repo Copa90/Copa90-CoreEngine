@@ -35,7 +35,7 @@ function postRequest (url, body, callback) {
 function getRequest(url, callback) {
   request.get(url)
     .on('data', function (data) {
-      callback(null, JSON.parse(data))
+      callback(null, data)
     })
     .on('error', function (err) {
       console.log(err)
@@ -46,7 +46,7 @@ function getRequest(url, callback) {
 module.exports = function(verification) {
 
 	var baseURL = 'https://api.kavenegar.com/v1/@/verify/lookup.json'
-	var token = '33434D58303256744D72316F674A54755734616176413D3D	'
+	var token = '33434D58303256744D72316F674A54755734616176413D3D'
 
 	var begURL = baseURL.replace('@', token)
 
@@ -65,10 +65,9 @@ module.exports = function(verification) {
 	function sendSMS(phoneNumber, randNumb, callback) {
 		var data = {
 			'receptor': phoneNumber,
-			'token': sendVerificationAlgorithm,
+			'token': randNumb,
 			'template': 'VerificationNo1'
 		}
-
 		var url = begURL + '?' + utility.generateQueryString(data)
 
 		getRequest(url, function(err, result) {
@@ -106,15 +105,15 @@ module.exports = function(verification) {
 		})
 	}
 
-	function sendVerificationAlgorithm(phoneNumber, verification, callback) {
+	function sendVerificationAlgorithm(phoneNumber, verif, callback) {
 		checkExistance(phoneNumber, function(err, result) {
 			if (err)
 				return callback(err, null)
 			if (!result) {
-				createVerification(phoneNumber, verification, function(err, result) {
+				createVerification(phoneNumber, verif, function(err, result) {
 					if (err)
 						return callback(err, null)
-					sendSMS(phoneNumber, verification, function(err, result) {
+					sendSMS(phoneNumber, verif, function(err, result) {
 						if (err)
 							return callback(err, null)
 						return callback(null, result)
@@ -124,10 +123,10 @@ module.exports = function(verification) {
 			else if (result.status === statusConfig.verified)
 				return callback(null, 'already verified')
 			else {
-				result.updateAttribute('verificationNumber', verification, function(err, result) {
+				result.updateAttribute('verificationNumber', verif, function(err, result) {
 					if (err)
 						return callback(err, null)
-					sendSMS(phoneNumber, verification, function(err, result) {
+					sendSMS(phoneNumber, verif, function(err, result) {
 						if (err)
 							return callback(err, null)
 						return callback(null, result)
@@ -137,15 +136,15 @@ module.exports = function(verification) {
 		})
 	}
 
-	function createVerification(phoneNumber, verification, callback) {
-		verification.create({'phoneNumber': phoneNumber, 'verificationNumber': verification, 'status': statusConfig.pending}, function(err, result) {
+	function createVerification(phoneNumber, verif, callback) {
+		verification.create({'phoneNumber': phoneNumber, 'verificationNumber': verif, 'status': statusConfig.pending}, function(err, result) {
 			if (err)
 				return callback(err, null)
 			return callback(null, result)
 		})
 	}
 
-	function doVerificationAlgorithm(phoneNumber, verification, callback) {
+	function doVerificationAlgorithm(phoneNumber, verif, callback) {
 		checkExistance(phoneNumber, function(err, result) {
 			if (err)
 				return callback(err, null)
@@ -154,7 +153,7 @@ module.exports = function(verification) {
 			else if (result.status === statusConfig.verified)
 				return callback(null, 'already verified')
 			else {
-				if (result.verificationNumber === verification) {
+				if (result.verificationNumber === verif) {
 					result.updateAttribute('status', statusConfig.verified, function(err, result) {
 						if (err)
 							return callback(err, null)
@@ -165,7 +164,7 @@ module.exports = function(verification) {
 		})
 	}
 
-  verification.sendVerification = function (phoneNumber, cb) {
+  verification.sendVerification = function (phoneNumber, callback) {
 		var rand = getRandomInt(1250, 9999)
 		sendVerificationAlgorithm(phoneNumber, rand, function(err, response) {
 			if (err)
@@ -179,23 +178,23 @@ module.exports = function(verification) {
       arg: 'phoneNumber',
       type: 'string',
       http: {
-        source: 'query'
+        source: 'path'
       }
     }],
     description: 'send verification sms to user',
     http: {
-      path: '/sendVerification/:phoneNumber',
+      path: '/:phoneNumber/sendVerification',
       verb: 'POST',
       status: 200,
       errorStatus: 400
     },
     returns: {
-      type: 'string',
+      type: 'object',
       root: true
     }
   })
 
-  verification.verification = function (phoneNumber, verifyNumber, cb) {
+  verification.verify = function (phoneNumber, verifyNumber, callback) {
 		doVerificationAlgorithm(phoneNumber, verifyNumber, function(err, response) {
 			if (err)
 				return callback(err, null)
@@ -203,44 +202,44 @@ module.exports = function(verification) {
 		})
   }
 
-  verification.remoteMethod('verification', {
+  verification.remoteMethod('verify', {
     accepts: [{
       arg: 'phoneNumber',
       type: 'string',
       http: {
-        source: 'query'
+        source: 'path'
       }
     }, {
       arg: 'verifyNumber',
       type: 'string',
       http: {
-        source: 'query'
+        source: 'path'
       }
     }],
     description: 'verify user phone number by sent verification number',
     http: {
-      path: '/verification/:phoneNumber/:verifyNumber',
+      path: '/:phoneNumber/verify/:verifyNumber',
       verb: 'POST',
       status: 200,
       errorStatus: 400
     },
     returns: {
-      type: 'string',
+      type: 'object',
       root: true
     }
   })
 
-	verification.checkUserVerification = function (phoneNumber, cb) {
+	verification.checkUserVerification = function (phoneNumber, callback) {
 		checkExistance(phoneNumber, function(err, result) {
 			if (err)
 				return callback(err, null)
 			if (!result)
-				return callback(null, false)
+				return callback(null, 0)
 			else {
 				if (result.status === statusConfig.pending)
-					return callback(null, false)
+					return callback(null, 1)
 				else if (result.status === statusConfig.verified)
-					return callback(null, true)
+					return callback(null, 2)
 			}
 		})
   }
@@ -250,7 +249,7 @@ module.exports = function(verification) {
       arg: 'phoneNumber',
       type: 'string',
       http: {
-        source: 'query'
+        source: 'path'
       }
     }],
     description: 'check user verification latest status',
@@ -261,7 +260,7 @@ module.exports = function(verification) {
       errorStatus: 400
     },
     returns: {
-      type: 'Boolean',
+      type: 'number',
       root: true
     }
   })
