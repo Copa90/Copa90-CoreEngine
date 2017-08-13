@@ -22,11 +22,17 @@ module.exports = function(challenge) {
 						if (err)
 							console.error(err)
 						var competition = app.models.competition
-						competition.find({'where':{'challengeId': challengeInst.id}, 'Order': 'Points DESC'}, function(err, competitionsList) {
+						competition.find({'where':{'challengeId': challengeInst.id}}, function(err, competitionsList) {
 							if (err)
 								console.error(err)
+							function compare(a, b){
+								return Number(b.points) - Number(a.points)
+							}
+							competitionsList.sort(compare)
+							if (competitionsList.length == 1)
+								return console.error('finishing challenge by one user without award')
 							var client = app.models.client
-							client.find({'where':{'id': competitionsList[0].clientId}}, function(err, clientInst) {
+							client.findById(competitionsList[0].clientId, function(err, clientInst) {
 								if (err)
 									console.error(err)
 								var award = (challengeInst.reduceChances * 2) + clientInst.accountInfoModel.chances
@@ -71,19 +77,24 @@ module.exports = function(challenge) {
 			modelInstance.clients.add(clientInst, function(err, result) {
 				if (err)
 					return next(err)
-				return next()
+				var newChances = clientInst.accountInfoModel.chances - modelInstance.reduceChances
+				clientInst.accountInfo.update({'chances': newChances}, function(err, result) {
+					if (err)
+						return next(err)
+					return next(null, 'Successfuly Joined')							
+				})
 			})
 		})
 	})
 
-	challenge.beforeRemote('updateById', function (ctx, modelInstance, next) {
+	challenge.beforeRemote('replaceById', function (ctx, modelInstance, next) {
     if (!ctx.args.options.accessToken)
       return next()
     roleManager.getRolesById(app, ctx.args.options.accessToken.userId, function (err, response) {
       if (err)
         return next(err)
       if (response.roles.length == 0) {
-				challenge.findById(ctx.args.data.id, function(err, challengeInst) {
+				challenge.findById(ctx.req.params.id, function(err, challengeInst) {
 					if (err)
 						return next(err)
 					if (ctx.args.options.accessToken.userId !== challengeInst.creatorId)
@@ -91,6 +102,12 @@ module.exports = function(challenge) {
 					var whiteList = ['name']
 					if (!utility.inputChecker(ctx.args.data, whiteList))
 						return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
+					ctx.args.data.creatorId = challengeInst.creatorId
+					ctx.args.data.reduceChances = challengeInst.reduceChances
+					ctx.args.data.period = challengeInst.period
+					ctx.args.data.beginningTime = challengeInst.beginningTime
+					ctx.args.data.endingTime = challengeInst.endingTime
+					ctx.args.data.status = challengeInst.status
 					return next()
 				})
 			}
@@ -125,7 +142,7 @@ module.exports = function(challenge) {
 		roleManager.getRolesById(app, ctx.args.options.accessToken.userId, function (err, response) {
       if (err)
 				return next(err)
-			challenge.findById(ctx.args.data.id, function(err, challengeInst) {
+			challenge.findById(ctx.req.params.id, function(err, challengeInst) {
 				if (err)
 					return next(err)
 				var client = app.models.client
@@ -153,6 +170,9 @@ module.exports = function(challenge) {
 					return callback(err)
 				if (challengeClientsList.length + 1 > challengeInst.capacity)
 					return callback(new Error('Capacity is Full'))
+				for (var i = 0; i < challengeClientsList.length; i++)
+					if (challengeClientsList[i].id.toString() === clientId.toString())
+						return callback(new Error('Already Within'))
 				var client = app.models.client
 				client.findById(clientId, function(err, clientInst) {
 					if (err)
@@ -188,7 +208,7 @@ module.exports = function(challenge) {
         type: 'string',
         required: true,
         http: {
-          source: 'query'
+          source: 'path'
         }
       },
       {
@@ -196,7 +216,7 @@ module.exports = function(challenge) {
         type: 'string',
         required: true,
         http: {
-          source: 'query'
+          source: 'path'
         }
       }
     ],
@@ -216,7 +236,7 @@ module.exports = function(challenge) {
 		challenge.findById(challengeId, function(err, challengeInst) {
 			if (err)
 				return callback(err)
-			if (ctx.req.accessToken.userId === clientId)
+			if (ctx.req.accessToken.userId === challengeInst.creatorId)
 				return callback(new Error('Owner Can not Leave'))
 			var client = app.models.client
 			client.findById(clientId, function(err, clientInst) {
@@ -245,7 +265,7 @@ module.exports = function(challenge) {
         type: 'string',
         required: true,
         http: {
-          source: 'query'
+          source: 'path'
         }
       },
       {
@@ -253,7 +273,7 @@ module.exports = function(challenge) {
         type: 'string',
         required: true,
         http: {
-          source: 'query'
+          source: 'path'
         }
       }
     ],
