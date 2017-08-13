@@ -37,6 +37,12 @@
       "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "uploadFile"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "uploadSampleProImage"
     }
   ],
   "methods": {}
