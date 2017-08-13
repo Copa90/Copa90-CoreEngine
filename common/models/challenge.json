@@ -7,7 +7,7 @@
   },
   "properties": {
     "creatorId": {
-      "type": "number",
+      "type": "string",
       "required": true
     },
     "name": {
@@ -62,7 +62,7 @@
       "principalType": "ROLE",
       "principalId": "$authenticated",
       "permission": "ALLOW",
-      "property": "updateById"
+      "property": "replaceById"
     },
     {
       "principalType": "ROLE",
