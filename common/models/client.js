@@ -75,8 +75,10 @@ module.exports = function(client) {
     verification.checkUserVerification(ctx.args.data.phoneNumber, function(err, result) {
       if (err)
         return next(err)
-      if (!result)
+      if (result == 1)
         return next(new Error('Not Verified Yet!'))
+      if (result == 2)
+        return next(new Error('Already Verified!'))
       var whiteList = ['email', 'username', 'password', 'time', 'phoneNumber', 'fullname', 'referrer']
       if (!utility.inputChecker(ctx.args.data, whiteList))
         return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
@@ -85,8 +87,6 @@ module.exports = function(client) {
           ctx.args.data.emailVerified = true
           ctx.args.data.status        = userStatus.available
           ctx.args.data.email 				= ctx.args.data.email.toLowerCase()
-          ctx.args.data.sequencerModel = {}
-          ctx.args.data.sequencerModel.counter = {}
           ctx.args.data.accountInfoModel 	= {}
           ctx.args.data.accountInfoModel.chances 		    = 10
           ctx.args.data.accountInfoModel.roundWins 	    = 0
@@ -118,7 +118,7 @@ module.exports = function(client) {
     var option = {}
     option.name = '' + modelInstance.id
     var container = app.models.container
-    container.createContainer(option, function (err, container) {
+    container.createContainer(option, function (err, res) {
       if (err)
         return next(err)
       container.uploadSampleProImage(modelInstance.id, function(err, result) {
@@ -128,21 +128,21 @@ module.exports = function(client) {
           client.findById(modelInstance.referrer, function(err, referrerInst) {
             if (err)
               return next(err)
-            if (referrerInst.referralModel.clients.length >= 0) {
+            if (referrerInst.referralModel.clients.length >= 10) {
               return next()
             }
             else {
               var newClients = []
               newClients = referrerInst.referralModel.clients
               newClients.push(modelInstance.id)
-              referrerInst.referral.update({'clients': newClients}, function(err, result) {
+              referrerInst.referrals.update({'clients': newClients}, function(err, result) {
                 if (err)
                   return next(err)
                 var newReferrerChances = referrerInst.accountInfoModel.chances + 5
                 referrerInst.accountInfo.update({'chances': newReferrerChances}, function(err, result) {
                   if (err)
                     return next(err)
-                  var newModelInstanceChances = referrerInst.accountInfoModel.chances + 5
+                  var newModelInstanceChances = modelInstance.accountInfoModel.chances + 5
                   modelInstance.accountInfo.update({'chances': newModelInstanceChances}, function(err, result) {
                     if (err)
                       return next(err)
@@ -275,29 +275,29 @@ module.exports = function(client) {
     if (!ctx.req.accessToken)
       return callback(new Error('AccessToken Required'))
 
-    if (ctx.req.accessToken.userId !== championInst.creatorId)
+    if (ctx.req.accessToken.userId !== clientId)
       return callback(new Error('Owner Error'))
 
     client.findById(clientId, function(err, clientInst) {
-      var index = 0
-      if (clientInst.sequencerModel.counter[leagueId])
-        index = clientInst.sequencerModel.counter[leagueId]
-      clientInst.sequencerModel.counter[leagueId] = index
-      var league = app.models.league
-      league.findById(leagueId, function(err, leagueInst) {
+      clientInst.estimates({'where':{'status':'Open'}}, function(err, estimatesList) {
         if (err)
           return callback(err)
-        leagueInst.predicts(function(err, predictsList) {
+        var estimatesIds = []
+        for (var i = 0; i < estimatesList.length; i++)
+          estimatesIds.push(estimatesList[i].predictId.toString())
+        var league = app.models.league
+        league.findById(leagueId, function(err, leagueInst) {
           if (err)
             return callback(err)
-          if (index >= predictsList.length)
-            return callback(new Error('end of predication list of this league'))
-          var nextPredict = predictsList[index]
-          clientInst.sequencerModel.counter[leagueId] += 1
-          clientInst.sequencer.update({'counter': clientInst.sequencerModel.counter}, function(err, result) {
+          leagueInst.predicts({'where':{'status':'Working'}}, function(err, predictsList) {
             if (err)
               return callback(err)
-            return callback(null, nextPredict)
+            var res = []
+            for (var i = 0; i < predictsList.length; i++) {
+              if (estimatesIds.indexOf(predictsList[i].id.toString()) <= -1)
+                res.push(predictsList[i])
+            }
+            return callback(null, res)
           })
         })
       })
@@ -317,14 +317,14 @@ module.exports = function(client) {
         type: 'string',
         required: true,
         http: {
-          source: 'query'
+          source: 'path'
         }
       }, {
         arg: 'leagueId',
         type: 'string',
         required: true,
         http: {
-          source: 'query'
+          source: 'path'
         }
       }
     ],
@@ -335,7 +335,7 @@ module.exports = function(client) {
       errorStatus: 400
     },
     returns: {
-			type: 'string',
+			type: 'object',
 			root: true
     }
   })
@@ -353,7 +353,7 @@ module.exports = function(client) {
         verification.sendPassword(clientInst.phoneNumber, clientInst.password, function(err, result) {
           if (err)
             return callback(err, null)
-          return callback(null, result)
+          return callback(null, 'successfuly password sent')
         })
       }
     })
@@ -366,7 +366,7 @@ module.exports = function(client) {
         type: 'string',
         required: true,
         http: {
-          source: 'query'
+          source: 'path'
         }
       }
     ],
