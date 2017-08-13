@@ -18,7 +18,7 @@ module.exports = function(champion) {
 					if (err)
 						return console.error(err)
 					var totalPoint = 0
-					var totalPerson = 0
+					var totalPerson = []
 					var personList = []
 					for (var j = 0; j < rankingList.length; j++) {
 						totalPoint += rankingList[j].points
@@ -28,7 +28,7 @@ module.exports = function(champion) {
 					totalPerson = personList.length
 					var period = time - champion.beginningTime
 					
-					var hitRate = totalPoint / (period * totalPerson) * 1000000
+					var hitRate = (totalPoint / (period * totalPerson) * 1000000) || 0
 					championInst.updateAttribute('hitRate', hitRate, function(err, result) {
 						if (err)
 							return console.error(err)
@@ -74,14 +74,14 @@ module.exports = function(champion) {
 		})
 	})
 
-	champion.beforeRemote('updateById', function (ctx, modelInstance, next) {
+	champion.beforeRemote('replaceById', function (ctx, modelInstance, next) {
     if (!ctx.args.options.accessToken)
       return next()
     roleManager.getRolesById(app, ctx.args.options.accessToken.userId, function (err, response) {
       if (err)
         return next(err)
       if (response.roles.length == 0) {
-				champion.findById(ctx.args.data.id, function(err, championInst) {
+				champion.findById(ctx.req.params.id, function(err, championInst) {
 					if (err)
 						return next(err)
 					if (ctx.args.options.accessToken.userId !== championInst.creatorId)
@@ -89,6 +89,7 @@ module.exports = function(champion) {
 					var whiteList = ['name', 'capacity', 'reduceChances']
 					if (!utility.inputChecker(ctx.args.data, whiteList))
 						return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
+					ctx.args.data.creatorId = championInst.creatorId
 					if (ctx.args.data.capacity < 5)
 						return next(new Error('Capacity Can not be Less than 5!'))
 					championInst.clients(function(err, champClientsList) {
@@ -131,7 +132,7 @@ module.exports = function(champion) {
 		roleManager.getRolesById(app, ctx.args.options.accessToken.userId, function (err, response) {
       if (err)
 				return next(err)
-			champion.findById(ctx.args.data.id, function(err, championInst) {
+			champion.findById(ctx.req.params.id, function(err, championInst) {
 				if (err)
 					return next(err)
 				var client = app.models.client
@@ -160,7 +161,7 @@ module.exports = function(champion) {
 				if (champClientsList.length + 1 > championInst.capacity)
 					return callback(new Error('Capacity is Full'))
 				for (var i = 0; i < champClientsList.length; i++)
-					if (champClientsList[i].id === clientId)
+					if (champClientsList[i].id.toString() === clientId.toString())
 						return callback(new Error('Already Within'))
 				var client = app.models.client
 				client.findById(clientId, function(err, clientInst) {
@@ -197,7 +198,7 @@ module.exports = function(champion) {
         type: 'string',
         required: true,
         http: {
-          source: 'query'
+          source: 'path'
         }
       },
       {
@@ -205,7 +206,7 @@ module.exports = function(champion) {
         type: 'string',
         required: true,
         http: {
-          source: 'query'
+          source: 'path'
         }
       }
     ],
@@ -256,7 +257,7 @@ module.exports = function(champion) {
         type: 'string',
         required: true,
         http: {
-          source: 'query'
+          source: 'path'
         }
       },
       {
@@ -264,7 +265,7 @@ module.exports = function(champion) {
         type: 'string',
         required: true,
         http: {
-          source: 'query'
+          source: 'path'
         }
       }
     ],
@@ -284,7 +285,7 @@ module.exports = function(champion) {
 		champion.findById(championId, function(err, championInst) {
 			if (err)
 				return callback(err)
-			if (ctx.req.accessToken.userId === clientId)
+			if (ctx.req.accessToken.userId === championInst.creatorId)
 				return callback(new Error('Owner Can not left'))
 			var client = app.models.client
 			client.findById(clientId, function(err, clientInst) {
@@ -313,7 +314,7 @@ module.exports = function(champion) {
         type: 'string',
         required: true,
         http: {
-          source: 'query'
+          source: 'path'
         }
       },
       {
@@ -321,7 +322,7 @@ module.exports = function(champion) {
         type: 'string',
         required: true,
         http: {
-          source: 'query'
+          source: 'path'
         }
       }
     ],
