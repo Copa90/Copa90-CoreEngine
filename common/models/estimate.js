@@ -38,14 +38,14 @@ module.exports = function(estimate) {
   estimate.afterRemote('create', function (ctx, modelInstance, next) {
 		var client = app.models.client
 		var predict = app.models.predict
-		client.findById(ctx.args.data.clientId, function(err, clientInst) {
+		client.findById(modelInstance.clientId, function(err, clientInst) {
 			if (err)
 				return next(err)
-			predict.findById(ctx.args.data.predictId, function(err, predictInst) {
+			predict.findById(modelInstance.predictId, function(err, predictInst) {
 				if (err)
 					return next(err)
 				var newChances = clientInst.accountInfoModel.chances - 1
-				var newTotalEstimates = client.accountInfoModel.totalEstimates + 1
+				var newTotalEstimates = clientInst.accountInfoModel.totalEstimates + 1
 				clientInst.accountInfo.update({'chances': newChances, 'totalEstimates': newTotalEstimates}, function(err, instance) {
 					if (err)
 						return next(err)
