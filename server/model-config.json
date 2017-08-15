@@ -103,5 +103,9 @@
   "checkpoint": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "award": {
+    "dataSource": null,
+    "public": true
   }
 }
