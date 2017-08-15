@@ -175,4 +175,46 @@ module.exports = function(predict) {
 		else 
 			return next()
 	})
+
+  predict.finalizePredict = function (predictId, callback) {
+		predict.findById(predictId, function(err, modelInstance) {
+			if (err)
+				return callback(err)
+			if ((modelInstance.status === statusConfig.working || modelInstance.status === statusConfig.closed) && (modelInstance.occurrence && modelInstance.occurrence != 0)) {
+				var client = app.models.client
+				modelInstance.updateAttribute('status', statusConfig.finished, function(err, predictInstance) {
+					if (err)
+						return callback(err)
+					finishPredict(predictInstance, function(err, result) {
+						if (err)
+							return callback(err)
+						return callback(null, result)
+					})
+				})
+			}
+			else 
+				return callback(new Error('Cant do Finalize'))
+		})
+  }
+
+  predict.remoteMethod('finalizePredict', {
+    accepts: [{
+      arg: 'predictId',
+      type: 'string',
+      http: {
+        source: 'path'
+      }
+    }],
+    description: 'finalize a predict',
+    http: {
+      path: '/finalizePredict/:predictId',
+      verb: 'POST',
+      status: 200,
+      errorStatus: 400
+    },
+    returns: {
+      type: 'object',
+      root: true
+    }
+  })
 }
