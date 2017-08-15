@@ -28,7 +28,7 @@ module.exports = function(package) {
 			if (err)
 				console.error(err)
 			for (var i = 0; i < packageList.length; i++) {
-				if (packageList[i].beginningTime <= time && packageList[i].endingTime >= time) {
+				if (Number(packageList[i].beginningTime) <= time && Number(packageList[i].endingTime) >= time) {
 					packageList[i].updateAttribute('status', statusConfig.working, function (err, packageInst) {
 						if (err)
 							console.error(err)
@@ -48,7 +48,7 @@ module.exports = function(package) {
 			if (err)
 				console.error(err)
 			for (var i = 0; i < packageList.length; i++) {
-				if (packageList[i].endingTime <= time) {
+				if (Number(packageList[i].endingTime) <= time) {
 					packageList[i].updateAttribute('status', statusConfig.finished, function (err, packageInst) {
 						if (err)
 							console.error(err)
@@ -67,7 +67,7 @@ module.exports = function(package) {
       return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
 		var time = utility.getUnixTimeStamp()
 		if (ctx.args.data.beginningTime && ctx.args.data.endingTime)
-			if (ctx.args.data.beginningTime < time || ctx.args.data.endingTime < time || ctx.args.data.beginningTime > ctx.args.data.endingTime)
+			if (Number(ctx.args.data.beginningTime) < time || Number(ctx.args.data.endingTime) < time || Number(ctx.args.data.beginningTime) > Number(ctx.args.data.endingTime))
 				return next(new Error('Error in BeginningTime and EndingTime Date Times'))
 		ctx.args.data.status = statusConfig.created
     return next()
@@ -78,9 +78,9 @@ module.exports = function(package) {
     if (!utility.inputChecker(ctx.args.data, whiteList))
       return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
 		var time = utility.getUnixTimeStamp() - 300000
-		if ((ctx.args.data.beginningTime) && !(ctx.args.data.beginningTime >= time))
+		if ((ctx.args.data.beginningTime) && !(Number(ctx.args.data.beginningTime) >= time))
 			return next(new Error('Error in BeginningTime Date Times'))
-		if ((ctx.args.data.endingTime) && !(ctx.args.data.endingTime >= time))
+		if ((ctx.args.data.endingTime) && !(Number(ctx.args.data.endingTime) >= time))
 			return next(new Error('Error in EndingTime Date Times'))
     return next()
   })

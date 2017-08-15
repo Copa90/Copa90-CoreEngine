@@ -18,16 +18,16 @@ module.exports = function(estimate) {
 		client.findById(ctx.args.data.clientId, function(err, clientInst) {
 			if (err)
 				return next(err)
-			if (clientInst.accountInfoModel.chances <= 0)
-				return next(new Error('Your Chance is Over!'))
+			if (Number(clientInst.accountInfoModel.chances) <= 0)
+				return next(new Error('خطا! فرصت‌های شما برای پیش‌بینی تمام شده‌است'))
 			predict.findById(ctx.args.data.predictId, function(err, predictInst) {
 				if (err)
 					return next(err)
 				var time = utility.getUnixTimeStamp()
 				if (!(predictInst.status === predictStatusConfig.working))
-					return next(new Error('Prediction is not Woking!'))
-				if (!(time >= predictInst.beginningTime && time <= predictInst.endingTime))
-					return next(new Error('Estimate on This Prediction is Over!'))
+					return next(new Error('خطا! این پیش‌بینی دیگر باز نیست'))
+				if (!(time >= Number(predictInst.beginningTime) && time <= Number(predictInst.endingTime)))
+					return next(new Error('خطا! دوره زمانی این پیش‌بینی تمام شده‌است'))
 				ctx.args.data.status = statusConfig.open
 				ctx.args.data.point = Number(predictInst.point)
 				return next()	
@@ -44,8 +44,8 @@ module.exports = function(estimate) {
 			predict.findById(modelInstance.predictId, function(err, predictInst) {
 				if (err)
 					return next(err)
-				var newChances = clientInst.accountInfoModel.chances - 1
-				var newTotalEstimates = clientInst.accountInfoModel.totalEstimates + 1
+				var newChances = Number(clientInst.accountInfoModel.chances) - 1
+				var newTotalEstimates = Number(clientInst.accountInfoModel.totalEstimates) + 1
 				clientInst.accountInfo.update({'chances': newChances, 'totalEstimates': newTotalEstimates}, function(err, instance) {
 					if (err)
 						return next(err)

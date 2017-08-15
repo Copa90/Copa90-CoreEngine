@@ -17,7 +17,7 @@ module.exports = function(challenge) {
 			if (err)
 				console.error(err)
 			for (var i = 0; i < challengeList.length; i++) {
-				if (challengeList[i].endingTime <= time) {
+				if (Number(challengeList[i].endingTime) <= time) {
 					challengeList[i].updateAttribute('status', statusConfig.finished, function (err, challengeInst) {
 						if (err)
 							console.error(err)
@@ -35,7 +35,7 @@ module.exports = function(challenge) {
 							client.findById(competitionsList[0].clientId, function(err, clientInst) {
 								if (err)
 									console.error(err)
-								var award = (challengeInst.reduceChances * 2) + clientInst.accountInfoModel.chances
+								var award = (Number(challengeInst.reduceChances) * 2) + Number(clientInst.accountInfoModel.chances)
 								clientInst.accountInfo.update({'chances': award}, function(err, result) {
 									if (err)
 										console.error(err)
@@ -57,12 +57,12 @@ module.exports = function(challenge) {
 		client.findById(ctx.args.data.creatorId, function(err, clientInst) {
 			if (err)
 				return next(err)
-			if (clientInst.accountInfo.chances < ctx.args.data.reduceChances)
-				return next(new Error('You Do not Have That Propper Chances!'))
-			if (ctx.args.data.period < 259200000)
-				return next(new Error('Period Can not be Less then 3 Days'))
+			if (Number(clientInst.accountInfoModel.chances) < Number(ctx.args.data.reduceChances))
+				return next(new Error('خطا! شما به اندازه کافی شانس برای ایجاد چالش ندارید'))
+			if (Number(ctx.args.data.period) < 259200000)
+				return next(new Error('خطا! طول مدت زمان چالش نباید کمتر از ۳ روز باشد'))
 			ctx.args.data.beginningTime = time
-			ctx.args.data.endingTime = time + ctx.args.data.period
+			ctx.args.data.endingTime = time + Number(ctx.args.data.period)
 			ctx.args.data.capacity = 2
 			ctx.args.data.status = statusConfig.working
 			return next()
@@ -77,7 +77,7 @@ module.exports = function(challenge) {
 			modelInstance.clients.add(clientInst, function(err, result) {
 				if (err)
 					return next(err)
-				var newChances = clientInst.accountInfoModel.chances - modelInstance.reduceChances
+				var newChances = Number(clientInst.accountInfoModel.chances) - Number(modelInstance.reduceChances)
 				clientInst.accountInfo.update({'chances': newChances}, function(err, result) {
 					if (err)
 						return next(err)
@@ -97,16 +97,16 @@ module.exports = function(challenge) {
 				challenge.findById(ctx.req.params.id, function(err, challengeInst) {
 					if (err)
 						return next(err)
-					if (ctx.args.options.accessToken.userId !== challengeInst.creatorId)
-						return next(new Error('You have not Access to Challenge!'))
+					if (ctx.args.options.accessToken.userId.toString() !== challengeInst.creatorId.toString())
+						return next(new Error('خطا! شما برای اعمال تغییرات دسترسی ندارید'))
 					var whiteList = ['name']
 					if (!utility.inputChecker(ctx.args.data, whiteList))
 						return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
-					ctx.args.data.creatorId = challengeInst.creatorId
-					ctx.args.data.reduceChances = challengeInst.reduceChances
-					ctx.args.data.period = challengeInst.period
-					ctx.args.data.beginningTime = challengeInst.beginningTime
-					ctx.args.data.endingTime = challengeInst.endingTime
+					ctx.args.data.creatorId = challengeInst.creatorId.toString()
+					ctx.args.data.reduceChances = Number(challengeInst.reduceChances)
+					ctx.args.data.period = Number(challengeInst.period)
+					ctx.args.data.beginningTime = Number(challengeInst.beginningTime)
+					ctx.args.data.endingTime = Number(challengeInst.endingTime)
 					ctx.args.data.status = challengeInst.status
 					return next()
 				})
@@ -124,7 +124,7 @@ module.exports = function(challenge) {
 				if (err)
 					return next(err)
 				if (challengeClientsList.length == 1) {
-					var newChances = clientModel.accountInfoModel.chances + challengeModel.reduceChances
+					var newChances = Number(clientModel.accountInfoModel.chances) + Number(challengeModel.reduceChances)
 					clientModel.accountInfo.update({'chances': newChances}, function(err, result) {
 						if (err)
 							return next(err)
@@ -150,8 +150,8 @@ module.exports = function(challenge) {
 					if (err)
 						return callback(err)
 					if (response.roles.length == 0) {
-						if (ctx.args.options.accessToken.userId !== challengeInst.creatorId)
-							return next(new Error('You have not Access to Challenge!'))							
+						if (ctx.args.options.accessToken.userId.toString() !== challengeInst.creatorId.toString())
+							return next(new Error('خطا! شما برای حذف این چالش دسترسی ندارید'))							
 						returnChances(challengeInst, clientInst)
 					}
 					else 
@@ -168,21 +168,21 @@ module.exports = function(challenge) {
 			challengeInst.clients(function(err, challengeClientsList) {
 				if (err)
 					return callback(err)
-				if (challengeClientsList.length + 1 > challengeInst.capacity)
-					return callback(new Error('Capacity is Full'))
+				if (Number(challengeClientsList.length) + 1 > Number(challengeInst.capacity))
+					return callback(new Error('خطا! ظرفیت چالش تکمیل است'))
 				for (var i = 0; i < challengeClientsList.length; i++)
 					if (challengeClientsList[i].id.toString() === clientId.toString())
-						return callback(new Error('Already Within'))
+						return callback(new Error('خطا! شما در حال حاضر در این چالش حضور دارید'))
 				var client = app.models.client
 				client.findById(clientId, function(err, clientInst) {
 					if (err)
 						return callback(err)
-					if (clientInst.accountInfoModel.chances < challengeInst.reduceChances)
-						return callback(new Error('Not Enough Chances to Join'))
+					if (Number(clientInst.accountInfoModel.chances) < Number(challengeInst.reduceChances))
+						return callback(new Error('خطا! شما به اندازه کافی شانس برای پیوستن به این چالش ندارید'))
 					challengeInst.clients.add(clientInst, function(err, result) {
 						if (err)
 							return callback(err)
-						var newChances = clientInst.accountInfoModel.chances - challengeInst.reduceChances
+						var newChances = Number(clientInst.accountInfoModel.chances) - Number(challengeInst.reduceChances)
 						clientInst.accountInfo.update({'chances': newChances}, function(err, result) {
 							if (err)
 								return callback(err)
@@ -236,8 +236,8 @@ module.exports = function(challenge) {
 		challenge.findById(challengeId, function(err, challengeInst) {
 			if (err)
 				return callback(err)
-			if (ctx.req.accessToken.userId === challengeInst.creatorId)
-				return callback(new Error('Owner Can not Leave'))
+			if (ctx.req.accessToken.userId.toString() === challengeInst.creatorId.toString())
+				return callback(new Error('خطا! سازنده چالش نمی‌تواند از آن خارج شود'))
 			var client = app.models.client
 			client.findById(clientId, function(err, clientInst) {
 				if (err)

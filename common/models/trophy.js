@@ -17,12 +17,12 @@ module.exports = function (trophy) {
 
   trophy.trophyCheck = function (clientInst, cb) {
     var badgeArray = [0, 150, 300, 500, 1000, 2000, 4000, 8000, 15000, 25000, 50000]
-    var totalPoints = clientInst.accountInfoModel.totalPoints
-    if (clientInst.trophyModel.level + 1 < badgeArray.length) {
-      if (totalPoints > badgeArray[clientInst.trophyModel.level + 1]) {
+    var totalPoints = Number(clientInst.accountInfoModel.totalPoints)
+    if (Number(clientInst.trophyModel.level) + 1 < badgeArray.length) {
+      if (totalPoints > badgeArray[Number(clientInst.trophyModel.level) + 1]) {
         var data = {
           'time': utility.getUnixTimeStamp(),
-          'level': clientInst.trophyModel.level + 1
+          'level': Number(clientInst.trophyModel.level) + 1
         }
         clientInst.trophy.update(data, function(err, result) {
           if (err)

@@ -36,15 +36,15 @@ module.exports = function(predict) {
 						updateInstance.client(function(err, clientInst) {
 							if (err)
 								return cb(err)
-							var newRoundWins = clientInst.accountInfoModel.roundWins + 1
-							var newTotalPoints = client.accountInfoModel.totalPoints + predictInstance.point
+							var newRoundWins = Number(clientInst.accountInfoModel.roundWins) + 1
+							var newTotalPoints = Number(client.accountInfoModel.totalPoints) + Number(predictInstance.point)
 							clientInst.accountInfo.update({'roundWins': newRoundWins, 'totalPoints': newTotalPoints}, function(err, accountInst) {
 								if (err)
 									return cb(err)
 								var leaguePoint = 0
 								if (clientInst.checkpointModel.leagues[predictInstance.leagueId]) 
-									leaguePoint = clientInst.checkpointModel.leagues[predictInstance.leagueId]
-								clientInst.checkpointModel.leagues[predictInstance.leagueId] = leaguePoint + predictInstance.point
+									leaguePoint = Number(clientInst.checkpointModel.leagues[predictInstance.leagueId])
+								clientInst.checkpointModel.leagues[predictInstance.leagueId] = leaguePoint + Number(predictInstance.point)
 								clientInst.checkpoint.update({'leagues': clientInst.checkpointModel.leagues}, function(err, result) {
 									if (err)
 										return cb(err)
@@ -53,7 +53,7 @@ module.exports = function(predict) {
 										if (err)
 											return cb(err)
 										for (var j = 0; j < rankingList.length; j++) {
-											var innerPoints = rankingList[j].points + predictInstance.point
+											var innerPoints = Number(rankingList[j].points) + Number(predictInstance.point)
 											rankingList[j].updateAttribute('points', innerPoints, function(err, res) {
 												if (err)
 													return cb(err)
@@ -63,7 +63,7 @@ module.exports = function(predict) {
 														if (err)
 															return cb(err)
 														for (var j = 0; j < competitionList.length; j++) {
-															var innerPoints = competitionList[j].points + predictInstance.point
+															var innerPoints = Number(competitionList[j].points) + Number(predictInstance.point)
 															competitionList[j].updateAttribute('points', innerPoints, function(err, res) {
 																if (err)
 																	return cb(err)
@@ -104,7 +104,7 @@ module.exports = function(predict) {
 			if (err)
 				console.error(err)
 			for (var i = 0; i < predictList.length; i++) {
-				if (predictList[i].beginningTime <= time && predictList[i].endingTime >= time) {
+				if (Number(predictList[i].beginningTime) <= time && Number(predictList[i].endingTime) >= time) {
 					predictList[i].updateAttribute('status', statusConfig.working, function (err, predictInst) {
 						if (err)
 							console.error(err)
@@ -124,7 +124,7 @@ module.exports = function(predict) {
 			if (err)
 				console.error(err)
 			for (var i = 0; i < predictList.length; i++) {
-				if (predictList[i].endingTime <= time) {
+				if (Number(predictList[i].endingTime) <= time) {
 					predictList[i].updateAttribute('status', statusConfig.closed, function (err, predictInst) {
 						if (err)
 							console.error(err)

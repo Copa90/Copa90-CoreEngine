@@ -23,7 +23,7 @@ module.exports = function(transaction) {
 				modelInstance.clientRel(clientInst)
 				modelInstance.packageRel(packageInst)
 				if (modelInstance.status === statusConfig.successful) {
-					var newChances = client.accountInfoModel.chances + packageInst.chances
+					var newChances = Number(client.accountInfoModel.chances) + Number(packageInst.chances)
 					clientInst.accountInfo.update({'chances': newChances}, function(err, instance) {
 						if (err)
 							return next(err)
@@ -34,7 +34,7 @@ module.exports = function(transaction) {
 								client.findById(clientInst.referrer, function(err, referrerInst) {
 									if (err)
 										return next(err)
-									var newReferrerChances = referrerInst.accountInfoModel.chances + 5
+									var newReferrerChances = Number(referrerInst.accountInfoModel.chances) + 5
 									clientInst.accountInfo.update({'chances': newReferrerChances}, function(err, result) {
 										if (err)
 											return next(err)

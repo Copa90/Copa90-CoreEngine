@@ -27,7 +27,7 @@ module.exports = function(client) {
       if (err)
         return console.error(err)
       for (var i = 0; i < clientList.length; i++) {
-        var newChances = clientList[i].accountInfoModel.chances + 1
+        var newChances = Number(clientList[i].accountInfoModel.chances) + 1
         clientList[i].accountInfo.update({'chances': newChances}, function(err, result) {
           if (err)
             return console.error(err)
@@ -56,7 +56,7 @@ module.exports = function(client) {
       if (err)
         return next(err)
       if (results.length == 0)
-        return next(new Error('client does not exists'))
+        return next(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
       var clientInst = results[0]
       ctx.args.credentials.email 	= clientInst.email.toLowerCase()
       ctx.req.body.email 					= clientInst.email.toLowerCase()
@@ -76,14 +76,15 @@ module.exports = function(client) {
       if (err)
         return next(err)
       if (result == 1)
-        return next(new Error('Not Verified Yet!'))
+        return next(new Error('خطا! شما هنوز احراز هویت نکرده‌اید'))
       if (result == 2)
-        return next(new Error('Already Verified!'))
+        return next(new Error('خطا! اکانت شما در حال حاضر احراز هویت شده‌است'))
       var whiteList = ['email', 'username', 'password', 'time', 'phoneNumber', 'fullname', 'referrer']
       if (!utility.inputChecker(ctx.args.data, whiteList))
         return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
       else {
         function done() {
+          ctx.args.data.time          = Number(ctx.args.data.time)
           ctx.args.data.emailVerified = true
           ctx.args.data.status        = userStatus.available
           ctx.args.data.email 				= ctx.args.data.email.toLowerCase()
@@ -95,7 +96,7 @@ module.exports = function(client) {
           ctx.args.data.referralModel = {}
           ctx.args.data.referralModel.clients = []
           ctx.args.data.trophyModel 	= {}
-          ctx.args.data.trophyModel.time    = ctx.args.data.time
+          ctx.args.data.trophyModel.time    = Number(ctx.args.data.time)
           ctx.args.data.trophyModel.level   = 0
           ctx.args.data.checkpointModel = {}
           ctx.args.data.checkpointModel.leagues = {}
@@ -104,7 +105,7 @@ module.exports = function(client) {
         if (ctx.args.data.referrer) {
           client.findById(ctx.args.data.referrer, function(err, result) {
             if (err)
-              return next(new Error('Referrer Does not Exists'))
+              return next(new Error('خطا! معرفی با این کد وجود ندارد'))
             done()
           })
         } else {
@@ -138,11 +139,11 @@ module.exports = function(client) {
               referrerInst.referrals.update({'clients': newClients}, function(err, result) {
                 if (err)
                   return next(err)
-                var newReferrerChances = referrerInst.accountInfoModel.chances + 5
+                var newReferrerChances = Number(referrerInst.accountInfoModel.chances) + 5
                 referrerInst.accountInfo.update({'chances': newReferrerChances}, function(err, result) {
                   if (err)
                     return next(err)
-                  var newModelInstanceChances = modelInstance.accountInfoModel.chances + 5
+                  var newModelInstanceChances = Number(modelInstance.accountInfoModel.chances) + 5
                   modelInstance.accountInfo.update({'chances': newModelInstanceChances}, function(err, result) {
                     if (err)
                       return next(err)
@@ -166,13 +167,13 @@ module.exports = function(client) {
       if (err)
         return next(err)
 			if (ctx.args.data.chances)
-				ctx.args.data.chances 		+= result.accountInfoModel.chances
+				ctx.args.data.chances 		+= Number(result.accountInfoModel.chances)
 			if (ctx.args.data.roundWins)
-				ctx.args.data.roundWins 	+= result.accountInfoModel.roundWins
+				ctx.args.data.roundWins 	+= Number(result.accountInfoModel.roundWins)
 			if (ctx.args.data.totalPoints)
-        ctx.args.data.totalPoints += result.accountInfoModel.totalPoints	
+        ctx.args.data.totalPoints += Number(result.accountInfoModel.totalPoints)
 			if (ctx.args.data.totalEstimates)
-        ctx.args.data.totalEstimates += result.accountInfoModel.totalEstimates	      		
+        ctx.args.data.totalEstimates += Number(result.accountInfoModel.totalEstimates)
       return next()
     })
   })
@@ -205,7 +206,7 @@ module.exports = function(client) {
 
     if (!req.body.password || !req.body.confirmation ||
       req.body.password !== req.body.confirmation) {
-      return res.sendStatus(400, new Error('Passwords do not match'))
+      return res.sendStatus(400, new Error('خطا! پسورد شما با تائیدیه آن هماهنگ نیست'))
     }
 
     client.findById(req.accessToken.userId, function (err, user) {
@@ -273,10 +274,10 @@ module.exports = function(client) {
 
   client.nextObject = function (ctx, clientId, leagueId, callback) {
     if (!ctx.req.accessToken)
-      return callback(new Error('AccessToken Required'))
+      return callback(new Error('خطا! برای گرفتن پیش‌بینی‌ها نیاز است که ابتدا وارد شوید'))
 
-    if (ctx.req.accessToken.userId !== clientId)
-      return callback(new Error('Owner Error'))
+    if (ctx.req.accessToken.userId.toString() !== clientId.toString())
+      return callback(new Error('خطا! شما امکان دیدن پیش‌بینی‌ها را ندارید'))
 
     client.findById(clientId, function(err, clientInst) {
       clientInst.estimates({'where':{'status':'Open'}}, function(err, estimatesList) {
@@ -345,7 +346,7 @@ module.exports = function(client) {
       if (err)
         return callback(err)
       if (clients.length == 0) {
-        return callback(new Error('not registered yet'))
+        return callback(new Error('خطا! شما هنوز ثبت‌نام نکرده‌اید'))
       }
       else {
         clientInst = clients[0]

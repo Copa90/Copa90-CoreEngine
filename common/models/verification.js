@@ -69,7 +69,6 @@ module.exports = function(verification) {
 			'template': 'VerificationNo1'
 		}
 		var url = begURL + '?' + utility.generateQueryString(data)
-
 		getRequest(url, function(err, result) {
 			if (err)
 				return callback(err, null)
@@ -84,9 +83,7 @@ module.exports = function(verification) {
 			'receptor': phoneNumber,
 			'message': message
 		}
-
 		var url = beg + '?' + utility.generateQueryString(data)
-
 		getRequest(url, function(err, result) {
 			if (err)
 				return callback(err, null)
