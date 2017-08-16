@@ -24,63 +24,88 @@ module.exports = function(predict) {
 		predictInstance.estimates({'status': estimateStatusConfig.open}, function(err, estimateList) {
 			if (err)
 				return cb(err)
+			if (estimateList.length == 0)
+				return cb(null)
 			var time = utility.getUnixTimeStamp()
+			var counter3 = 0
 			for (var i = 0; i < estimateList.length; i++) {
 				var status = estimateStatusConfig.lose
-				if (ctx.args.data.occurrence == 1)
+				if (predictInstance.occurrence == 1)
 					status = estimateStatusConfig.win
 				estimateList[i].updateAttributes({'status': status, 'checkTime': time}, function(err, updateInstance) {
 					if (err)
 						return cb(err)
-					if (ctx.args.data.occurrence == 1) {
-						updateInstance.client(function(err, clientInst) {
+					if (predictInstance.occurrence == 1) {
+						updateInstance.clientRel(function(err, clientInst) {
 							if (err)
 								return cb(err)
 							var newRoundWins = Number(clientInst.accountInfoModel.roundWins) + 1
-							var newTotalPoints = Number(client.accountInfoModel.totalPoints) + Number(predictInstance.point)
+							var newTotalPoints = Number(clientInst.accountInfoModel.totalPoints) + Number(predictInstance.point)
 							clientInst.accountInfo.update({'roundWins': newRoundWins, 'totalPoints': newTotalPoints}, function(err, accountInst) {
 								if (err)
 									return cb(err)
 								var leaguePoint = 0
-								if (clientInst.checkpointModel.leagues[predictInstance.leagueId]) 
-									leaguePoint = Number(clientInst.checkpointModel.leagues[predictInstance.leagueId])
-								clientInst.checkpointModel.leagues[predictInstance.leagueId] = leaguePoint + Number(predictInstance.point)
+								if (clientInst.checkpointModel.leagues[predictInstance.leagueId.toString()]) 
+									leaguePoint = Number(clientInst.checkpointModel.leagues[predictInstance.leagueId.toString()])
+								clientInst.checkpointModel.leagues[predictInstance.leagueId.toString()] = leaguePoint + Number(predictInstance.point)
 								clientInst.checkpoint.update({'leagues': clientInst.checkpointModel.leagues}, function(err, result) {
 									if (err)
 										return cb(err)
-									var ranking = app.models.ranking
-									ranking.find({'where':{'clientId': clientInst.id}}, function(err, rankingList) {
+									function rankingUpdate(cb1) {
+										var ranking = app.models.ranking
+										ranking.find({'where':{'clientId': clientInst.id.toString()}}, function(err, rankingList) {
+											if (err)
+												return cb1(err)
+											if (rankingList.length == 0)
+												return cb1(null)
+											var counter1 = 0
+											for (var j = 0; j < rankingList.length; j++) {
+												var innerPoints = Number(rankingList[j].points) + Number(predictInstance.point)
+												rankingList[j].updateAttribute('points', innerPoints, function(err, res) {
+													counter1++
+													if (err)
+														return cb1(err)
+													if (counter1++ == rankingList.length)
+														return cb1(null, 'successful')
+												})
+											}
+										})
+									}
+									function competitionUpdate(cb2) {
+										var competition = app.models.competition
+										competition.find({'where':{'clientId': clientInst.id.toString()}}, function(err, competitionList) {
+											if (err)
+												return cb2(err)
+											if (competitionList.length == 0)
+												return cb2(null)
+											var counter2 = 0
+											for (var j = 0; j < competitionList.length; j++) {
+												var innerPoints = Number(competitionList[j].points) + Number(predictInstance.point)
+												competitionList[j].updateAttribute('points', innerPoints, function(err, res) {
+													counter2++
+													if (err)
+														return cb2(err)
+													if (counter2 == competitionList.length)
+														return cb2(null, 'successful')
+												})
+											}
+										})			
+									}
+									rankingUpdate(function(err) {
 										if (err)
 											return cb(err)
-										for (var j = 0; j < rankingList.length; j++) {
-											var innerPoints = Number(rankingList[j].points) + Number(predictInstance.point)
-											rankingList[j].updateAttribute('points', innerPoints, function(err, res) {
+										competitionUpdate(function(err) {
+											if (err)
+												return cb(err)
+											var trophy = app.models.trophy
+											trophy.trophyCheck(clientInst, function(err, result) {
+												counter3++
 												if (err)
 													return cb(err)
-												if (j == rankingList.length) {
-													var competition = app.models.competition
-													competition.find({'where':{'clientId': clientInst.id}}, function(err, competitionList) {
-														if (err)
-															return cb(err)
-														for (var j = 0; j < competitionList.length; j++) {
-															var innerPoints = Number(competitionList[j].points) + Number(predictInstance.point)
-															competitionList[j].updateAttribute('points', innerPoints, function(err, res) {
-																if (err)
-																	return cb(err)
-																if (i == estimateList.length) {
-																	var trophy = app.models.trophy
-																	trophy.trophyCheck(clientInst, function(err, result) {
-																		if (err)
-																			return cb(err)
-																		return cb(null)
-																	})
-																}
-															})
-														}
-													})
-												}
+												if (counter3 == estimateList.length)
+													return cb(null, result)
 											})
-										}
+										})
 									})
 								})
 							})
@@ -139,7 +164,7 @@ module.exports = function(predict) {
 
   predict.afterRemote('create', function (ctx, modelInstance, next) {
 		var league = app.models.league
-		league.findById(ctx.args.data.leagueId, function(err, leagueInst) {
+		league.findById(ctx.args.data.leagueId.toString(), function(err, leagueInst) {
 			if (err)
 				return next(err)
 			modelInstance.leagueRel(leagueInst)
@@ -176,19 +201,20 @@ module.exports = function(predict) {
 			return next()
 	})
 
-  predict.finalizePredict = function (predictId, callback) {
-		predict.findById(predictId, function(err, modelInstance) {
+  predict.finalizePredict = function (predictId, occurrence, callback) {
+		var ocr = Number(occurrence)
+		predict.findById(predictId.toString(), function(err, modelInstance) {
 			if (err)
 				return callback(err)
-			if ((modelInstance.status === statusConfig.working || modelInstance.status === statusConfig.closed) && (modelInstance.occurrence && modelInstance.occurrence != 0)) {
+			if ((modelInstance.status === statusConfig.working || modelInstance.status === statusConfig.closed) && (ocr)) {
 				var client = app.models.client
-				modelInstance.updateAttribute('status', statusConfig.finished, function(err, predictInstance) {
+				modelInstance.updateAttributes({'status': statusConfig.finished, 'occurrence': ocr}, function(err, predictInstance) {
 					if (err)
 						return callback(err)
 					finishPredict(predictInstance, function(err, result) {
 						if (err)
 							return callback(err)
-						return callback(null, result)
+						return callback(null, 'Successful Finishing Predict')
 					})
 				})
 			}
@@ -203,6 +229,12 @@ module.exports = function(predict) {
       type: 'string',
       http: {
         source: 'path'
+      }
+    }, {
+      arg: 'occurrence',
+      type: 'string',
+      http: {
+        source: 'query'
       }
     }],
     description: 'finalize a predict',
