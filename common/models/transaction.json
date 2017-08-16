@@ -58,18 +58,6 @@
     {
       "principalType": "ROLE",
       "principalId": "$everyone",
-      "permission": "DENY",
-      "property": "deleteById"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$everyone",
-      "permission": "DENY",
-      "property": "delete"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "create"
     }
