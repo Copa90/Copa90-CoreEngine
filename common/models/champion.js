@@ -14,19 +14,21 @@ module.exports = function(champion) {
 			for (var i = 0; i < championsList.length; i++) {
 				var championInst = championsList[i]
 				var ranking = app.models.ranking
-				ranking.find({where:{'leagueId': champion.id}}, function(err, rankingList) {
+				ranking.find({where:{'leagueId': championInst.id.toString()}}, function(err, rankingList) {
 					if (err)
 						return console.error(err)
+					if (rankingList.length == 1)
+						return console.error('champion does not exist')
 					var totalPoint = 0
 					var totalPerson = []
 					var personList = []
 					for (var j = 0; j < rankingList.length; j++) {
 						totalPoint += Number(rankingList[j].points)
 						if (totalPerson.indexOf(rankingList[j].clientId.toString()) <= -1)
-							totalPerson.push(rankingList[j].clientId)
+							totalPerson.push(rankingList[j].clientId.toString())
 					}
 					totalPerson = personList.length
-					var period = time - Number(champion.beginningTime)
+					var period = time - Number(championInst.beginningTime)
 					var hitRate = (totalPoint / (period * totalPerson) * 1000000) || 0
 					championInst.updateAttribute('hitRate', hitRate, function(err, result) {
 						if (err)
@@ -42,13 +44,11 @@ module.exports = function(champion) {
 	champion.beforeRemote('create', function (ctx, modelInstance, next) {
 		var time = utility.getUnixTimeStamp()
 		var client = app.models.client
-		client.findById(ctx.args.data.creatorId, function(err, clientInst) {
+		client.findById(ctx.args.data.creatorId.toString(), function(err, clientInst) {
 			if (err)
 				return next(err)
-			if (Number(clientInst.accountInfoModel.chances) < Number(ctx.args.data.reduceChances))
-				return next(new Error('خطا! شما به اندازه کافی شانس برای ایجاد لیگ خصوصی ندارید'))
-			if (ctx.args.data.capacity < 5)
-				return next(new Error('خطا! ظرفیت لیگ خصوصی نباید کمتر از ۵ نفر باشد'))
+			if (ctx.args.data.capacity < 2)
+				return next(new Error('خطا! ظرفیت لیگ خصوصی نباید کمتر از ۲ نفر باشد'))
 			ctx.args.data.beginningTime = time
 			ctx.args.data.hitRate = 0
 			return next()
@@ -57,18 +57,13 @@ module.exports = function(champion) {
 
 	champion.afterRemote('create', function (ctx, modelInstance, next) {
 		var client = app.models.client
-		client.findById(modelInstance.creatorId, function(err, clientInst) {
+		client.findById(modelInstance.creatorId.toString(), function(err, clientInst) {
 			if (err)
 				return next(err)
 			modelInstance.clients.add(clientInst, function(err, result) {
 				if (err)
 					return next(err)
-				var newChances = Number(clientInst.accountInfoModel.chances) - Number(modelInstance.reduceChances)
-				clientInst.accountInfo.update({'chances': newChances}, function(err, result) {
-					if (err)
-						return next(err)
-					return next()					
-				})
+				return next()					
 			})
 		})
 	})
@@ -76,21 +71,21 @@ module.exports = function(champion) {
 	champion.beforeRemote('replaceById', function (ctx, modelInstance, next) {
     if (!ctx.args.options.accessToken)
       return next()
-    roleManager.getRolesById(app, ctx.args.options.accessToken.userId, function (err, response) {
+    roleManager.getRolesById(app, ctx.args.options.accessToken.userId.toString(), function (err, response) {
       if (err)
         return next(err)
       if (response.roles.length == 0) {
-				champion.findById(ctx.req.params.id, function(err, championInst) {
+				champion.findById(ctx.req.params.id.toString(), function(err, championInst) {
 					if (err)
 						return next(err)
 					if (ctx.args.options.accessToken.userId.toString() !== championInst.creatorId.toString())
 						return next(new Error('خطا! شما برای اعمال تغییرات دسترسی ندارید'))
-					var whiteList = ['name', 'capacity', 'reduceChances']
+					var whiteList = ['name', 'capacity']
 					if (!utility.inputChecker(ctx.args.data, whiteList))
 						return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
 					ctx.args.data.creatorId = championInst.creatorId.toString()
-					if (Number(ctx.args.data.capacity) < 5)
-						return next(new Error('خطا! ظرفیت لیگ خصوصی نباید کمتر از ۵ نفر باشد'))
+					if (Number(ctx.args.data.capacity) < 2)
+						return next(new Error('خطا! ظرفیت لیگ خصوصی نباید کمتر از ۲ نفر باشد'))
 					championInst.clients(function(err, champClientsList) {
 						if (err)
 							return next(err)
@@ -112,30 +107,21 @@ module.exports = function(champion) {
 			championModel.clients(function(err, champClientsList) {
 				if (err)
 					return next(err)
-				if (champClientsList.length == 1) {
-					var newChances = Number(clientModel.accountInfoModel.chances) + Number(championModel.reduceChances)
-					clientModel.accountInfo.update({'chances': newChances}, function(err, result) {
-						if (err)
-							return next(err)
-						championModel.clients.destroyAll(function(err, result) {
-							if (err)
-								return next(err)
-							return next()							
-						})
-					})
-				}
-				else 
-					return next()
+				championModel.clients.destroyAll(function(err, result) {
+					if (err)
+						return next(err)
+					return next()							
+				})
 			})
 		}
-		roleManager.getRolesById(app, ctx.args.options.accessToken.userId, function (err, response) {
+		roleManager.getRolesById(app, ctx.args.options.accessToken.userId.toString(), function (err, response) {
       if (err)
 				return next(err)
-			champion.findById(ctx.req.params.id, function(err, championInst) {
+			champion.findById(ctx.req.params.id.toString(), function(err, championInst) {
 				if (err)
 					return next(err)
 				var client = app.models.client
-				client.findById(championInst.creatorId, function(err, clientInst) {
+				client.findById(championInst.creatorId.toString(), function(err, clientInst) {
 					if (err)
 						return callback(err)
 					if (response.roles.length == 0) {
@@ -151,7 +137,7 @@ module.exports = function(champion) {
 	})
 
   champion.joinChampion = function (ctx, championId, clientId, callback) {
-		champion.findById(championId, function(err, championInst) {
+		champion.findById(championId.toString(), function(err, championInst) {
 			if (err)
 				return callback(err)
 			championInst.clients(function(err, champClientsList) {
@@ -163,20 +149,13 @@ module.exports = function(champion) {
 					if (champClientsList[i].id.toString() === clientId.toString())
 						return callback(new Error('خطا! شما در حال حاضر در این لیگ خصوصی حضور دارید'))
 				var client = app.models.client
-				client.findById(clientId, function(err, clientInst) {
+				client.findById(clientId.toString(), function(err, clientInst) {
 					if (err)
 						return callback(err)
-					if (Number(clientInst.accountInfoModel.chances) < Number(championInst.reduceChances))
-						return callback(new Error('خطا! شما به اندازه کافی شانس برای پیوستن به این لیگ خصوصی ندارید'))
 					championInst.clients.add(clientInst, function(err, result) {
 						if (err)
 							return callback(err)
-						var newChances = Number(clientInst.accountInfoModel.chances) - Number(championInst.reduceChances)
-						clientInst.accountInfo.update({'chances': newChances}, function(err, result) {
-							if (err)
-								return callback(err)
-							return callback(null, 'Successfuly Joined')							
-						})
+						return callback(null, 'Successfuly Joined')							
 					})
 				})
 			})
@@ -222,7 +201,7 @@ module.exports = function(champion) {
   })
 
   champion.kickUser = function (ctx, championId, clientId, callback) {
-		champion.findById(championId, function(err, championInst) {
+		champion.findById(championId.toString(), function(err, championInst) {
 			if (err)
 				return callback(err)
 			if (ctx.req.accessToken.userId.toString() !== championInst.creatorId.toString())
@@ -230,7 +209,7 @@ module.exports = function(champion) {
 			if (ctx.req.accessToken.userId.toString() === clientId.toString())
 				return callback(new Error('خطا! سازنده لیگ خصوصی نمی‌تواند از آن اخراج شود'))
 			var client = app.models.client
-			client.findById(clientId, function(err, clientInst) {
+			client.findById(clientId.toString(), function(err, clientInst) {
 				if (err)
 					return callback(err)
 				championInst.clients.remove(clientInst, function(err, result) {
@@ -281,13 +260,13 @@ module.exports = function(champion) {
 	})
 	
   champion.leaveChampion = function (ctx, championId, clientId, callback) {
-		champion.findById(championId, function(err, championInst) {
+		champion.findById(championId.toString(), function(err, championInst) {
 			if (err)
 				return callback(err)
 			if (ctx.req.accessToken.userId.toString() === championInst.creatorId.toString())
 				return callback(new Error('خطا! سازنده لیگ خصوصی نمی‌تواند از آن خارج شود'))
 			var client = app.models.client
-			client.findById(clientId, function(err, clientInst) {
+			client.findById(clientId.toString(), function(err, clientInst) {
 				if (err)
 					return callback(err)
 				championInst.clients.remove(clientInst, function(err, result) {

@@ -17,11 +17,6 @@
     "capacity": {
       "type": "number",
       "required": true
-    },
-    "reduceChances": {
-      "type": "number",
-      "required": true,
-      "default": 0
     }
   },
   "validations": [],
