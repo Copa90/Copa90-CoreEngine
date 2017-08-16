@@ -56,7 +56,7 @@
     "estimates": {
       "type": "hasMany",
       "model": "estimate",
-      "foreignKey": "estimateId"
+      "foreignKey": "predictId"
     }
   },
   "acls": [
