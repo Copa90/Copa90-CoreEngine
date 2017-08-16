@@ -35,7 +35,7 @@ module.exports = function(transaction) {
 									if (err)
 										return next(err)
 									var newReferrerChances = Number(referrerInst.accountInfoModel.chances) + 5
-									clientInst.accountInfo.update({'chances': newReferrerChances}, function(err, result) {
+									referrerInst.accountInfo.update({'chances': newReferrerChances}, function(err, result) {
 										if (err)
 											return next(err)
 										return next()
