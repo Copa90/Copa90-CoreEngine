@@ -23,7 +23,7 @@ module.exports = function(transaction) {
 				modelInstance.clientRel(clientInst)
 				modelInstance.packageRel(packageInst)
 				if (modelInstance.status === statusConfig.successful) {
-					var newChances = Number(client.accountInfoModel.chances) + Number(packageInst.chances)
+					var newChances = Number(clientInst.accountInfoModel.chances) + Number(packageInst.chances)
 					clientInst.accountInfo.update({'chances': newChances}, function(err, instance) {
 						if (err)
 							return next(err)
