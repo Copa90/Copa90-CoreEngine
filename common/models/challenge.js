@@ -22,9 +22,11 @@ module.exports = function(challenge) {
 						if (err)
 							console.error(err)
 						var competition = app.models.competition
-						competition.find({'where':{'challengeId': challengeInst.id}}, function(err, competitionsList) {
+						competition.find({'where':{'challengeId': challengeInst.id.toString()}}, function(err, competitionsList) {
 							if (err)
 								console.error(err)
+							if (competitionsList.length == 1)
+								return console.error('challenge does not exist')
 							function compare(a, b){
 								return Number(b.points) - Number(a.points)
 							}
@@ -32,7 +34,7 @@ module.exports = function(challenge) {
 							if (competitionsList.length == 1)
 								return console.error('finishing challenge by one user without award')
 							var client = app.models.client
-							client.findById(competitionsList[0].clientId, function(err, clientInst) {
+							client.findById(competitionsList[0].clientId.toString(), function(err, clientInst) {
 								if (err)
 									console.error(err)
 								var award = (Number(challengeInst.reduceChances) * 2) + Number(clientInst.accountInfoModel.chances)
@@ -54,7 +56,7 @@ module.exports = function(challenge) {
 	challenge.beforeRemote('create', function (ctx, modelInstance, next) {
 		var time = utility.getUnixTimeStamp()
 		var client = app.models.client
-		client.findById(ctx.args.data.creatorId, function(err, clientInst) {
+		client.findById(ctx.args.data.creatorId.toString(), function(err, clientInst) {
 			if (err)
 				return next(err)
 			if (Number(clientInst.accountInfoModel.chances) < Number(ctx.args.data.reduceChances))
@@ -71,7 +73,7 @@ module.exports = function(challenge) {
 
 	challenge.afterRemote('create', function (ctx, modelInstance, next) {
 		var client = app.models.client
-		client.findById(modelInstance.creatorId, function(err, clientInst) {
+		client.findById(modelInstance.creatorId.toString(), function(err, clientInst) {
 			if (err)
 				return next(err)
 			modelInstance.clients.add(clientInst, function(err, result) {
@@ -90,11 +92,11 @@ module.exports = function(challenge) {
 	challenge.beforeRemote('replaceById', function (ctx, modelInstance, next) {
     if (!ctx.args.options.accessToken)
       return next()
-    roleManager.getRolesById(app, ctx.args.options.accessToken.userId, function (err, response) {
+    roleManager.getRolesById(app, ctx.args.options.accessToken.userId.toString(), function (err, response) {
       if (err)
         return next(err)
       if (response.roles.length == 0) {
-				challenge.findById(ctx.req.params.id, function(err, challengeInst) {
+				challenge.findById(ctx.req.params.id.toString(), function(err, challengeInst) {
 					if (err)
 						return next(err)
 					if (ctx.args.options.accessToken.userId.toString() !== challengeInst.creatorId.toString())
@@ -139,14 +141,14 @@ module.exports = function(challenge) {
 					return next()
 			})
 		}
-		roleManager.getRolesById(app, ctx.args.options.accessToken.userId, function (err, response) {
+		roleManager.getRolesById(app, ctx.args.options.accessToken.userId.toString(), function (err, response) {
       if (err)
 				return next(err)
-			challenge.findById(ctx.req.params.id, function(err, challengeInst) {
+			challenge.findById(ctx.req.params.id.toString(), function(err, challengeInst) {
 				if (err)
 					return next(err)
 				var client = app.models.client
-				client.findById(challengeInst.creatorId, function(err, clientInst) {
+				client.findById(challengeInst.creatorId.toString(), function(err, clientInst) {
 					if (err)
 						return callback(err)
 					if (response.roles.length == 0) {
@@ -162,7 +164,7 @@ module.exports = function(challenge) {
 	})
 
   challenge.joinChallenge = function (ctx, challengeId, clientId, callback) {
-		challenge.findById(challengeId, function(err, challengeInst) {
+		challenge.findById(challengeId.toString(), function(err, challengeInst) {
 			if (err)
 				return callback(err)
 			challengeInst.clients(function(err, challengeClientsList) {
@@ -174,7 +176,7 @@ module.exports = function(challenge) {
 					if (challengeClientsList[i].id.toString() === clientId.toString())
 						return callback(new Error('خطا! شما در حال حاضر در این چالش حضور دارید'))
 				var client = app.models.client
-				client.findById(clientId, function(err, clientInst) {
+				client.findById(clientId.toString(), function(err, clientInst) {
 					if (err)
 						return callback(err)
 					if (Number(clientInst.accountInfoModel.chances) < Number(challengeInst.reduceChances))
@@ -233,13 +235,13 @@ module.exports = function(challenge) {
 	})
 	
   challenge.leaveChallenge = function (ctx, challengeId, clientId, callback) {
-		challenge.findById(challengeId, function(err, challengeInst) {
+		challenge.findById(challengeId.toString(), function(err, challengeInst) {
 			if (err)
 				return callback(err)
 			if (ctx.req.accessToken.userId.toString() === challengeInst.creatorId.toString())
 				return callback(new Error('خطا! سازنده چالش نمی‌تواند از آن خارج شود'))
 			var client = app.models.client
-			client.findById(clientId, function(err, clientInst) {
+			client.findById(clientId.toString(), function(err, clientInst) {
 				if (err)
 					return callback(err)
 				challengeInst.clients.remove(clientInst, function(err, result) {

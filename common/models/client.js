@@ -27,6 +27,8 @@ module.exports = function(client) {
       if (err)
         return console.error(err)
       for (var i = 0; i < clientList.length; i++) {
+        if (!clientList[i].accountInfoModel)
+          continue
         var newChances = Number(clientList[i].accountInfoModel.chances) + 1
         clientList[i].accountInfo.update({'chances': newChances}, function(err, result) {
           if (err)
@@ -103,7 +105,7 @@ module.exports = function(client) {
           return next()
         }
         if (ctx.args.data.referrer) {
-          client.findById(ctx.args.data.referrer, function(err, result) {
+          client.findById(ctx.args.data.referrer.toString(), function(err, result) {
             if (err)
               return next(new Error('خطا! معرفی با این کد وجود ندارد'))
             done()
@@ -117,16 +119,16 @@ module.exports = function(client) {
 
   client.afterRemote('create', function (ctx, modelInstance, next) {
     var option = {}
-    option.name = '' + modelInstance.id
+    option.name = '' + modelInstance.id.toString()
     var container = app.models.container
     container.createContainer(option, function (err, res) {
       if (err)
         return next(err)
-      container.uploadSampleProImage(modelInstance.id, function(err, result) {
+      container.uploadSampleProImage(modelInstance.id.toString(), function(err, result) {
         if (err)
           return next(err)
         if (modelInstance.referrer) {
-          client.findById(modelInstance.referrer, function(err, referrerInst) {
+          client.findById(modelInstance.referrer.toString(), function(err, referrerInst) {
             if (err)
               return next(err)
             if (referrerInst.referralModel.clients.length >= 10) {
@@ -135,7 +137,7 @@ module.exports = function(client) {
             else {
               var newClients = []
               newClients = referrerInst.referralModel.clients
-              newClients.push(modelInstance.id)
+              newClients.push(modelInstance.id.toString())
               referrerInst.referrals.update({'clients': newClients}, function(err, result) {
                 if (err)
                   return next(err)
@@ -163,7 +165,7 @@ module.exports = function(client) {
   client.beforeRemote('prototype.__update__accountInfo', function (ctx, modelInstance, next) {
     if (!ctx.args.options.accessToken)
       return next()
-    client.findById(ctx.req.params.id, function (err, result) {
+    client.findById(ctx.req.params.id.toString(), function (err, result) {
       if (err)
         return next(err)
 			if (ctx.args.data.chances)
@@ -209,7 +211,7 @@ module.exports = function(client) {
       return res.sendStatus(400, new Error('خطا! پسورد شما با تائیدیه آن هماهنگ نیست'))
     }
 
-    client.findById(req.accessToken.userId, function (err, user) {
+    client.findById(req.accessToken.userId.toString(), function (err, user) {
       if (err) return res.sendStatus(404)
       user.updateAttribute('password', req.body.password, function (err, user) {
         if (err) return res.sendStatus(404)
@@ -259,7 +261,7 @@ module.exports = function(client) {
   client.on('resetPasswordRequest', function (info) {
     var url = 'http://' + config.host + ':' + config.port + '/reset-password'
     var html = 'Click <a href="' + url + '?access_token=' +
-      info.accessToken.id + '">here</a> to reset your password'
+      info.accessToken.id.toString() + '">here</a> to reset your password'
 
     client.app.models.Email.send({
       to: info.email,
@@ -279,7 +281,7 @@ module.exports = function(client) {
     if (ctx.req.accessToken.userId.toString() !== clientId.toString())
       return callback(new Error('خطا! شما امکان دیدن پیش‌بینی‌ها را ندارید'))
 
-    client.findById(clientId, function(err, clientInst) {
+    client.findById(clientId.toString(), function(err, clientInst) {
       clientInst.estimates({'where':{'status':'Open'}}, function(err, estimatesList) {
         if (err)
           return callback(err)
@@ -287,7 +289,7 @@ module.exports = function(client) {
         for (var i = 0; i < estimatesList.length; i++)
           estimatesIds.push(estimatesList[i].predictId.toString())
         var league = app.models.league
-        league.findById(leagueId, function(err, leagueInst) {
+        league.findById(leagueId.toString(), function(err, leagueInst) {
           if (err)
             return callback(err)
           leagueInst.predicts({'where':{'status':'Working'}}, function(err, predictsList) {

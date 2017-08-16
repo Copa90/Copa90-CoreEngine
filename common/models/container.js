@@ -13,7 +13,7 @@ module.exports = function(container) {
 
 	function writeDataInClientModel(clientId, profilePath, cb) {
 		var client = app.models.client
-		client.findById(clientId, function(err, clientInst) {
+		client.findById(clientId.toString(), function(err, clientInst) {
 			if (err)
 				return cb(err)
 			clientInst.updateAttribute('profilePath', profilePath, function(err, result) {
@@ -26,16 +26,16 @@ module.exports = function(container) {
 
 	container.uploadSampleProImage = function(clientId, cb) {
 		var size = 200
-		var png = jdenticon.toPng('' + clientId, size);
+		var png = jdenticon.toPng('' + clientId.toString(), size);
 
 		var directory = path.resolve(__dirname + '/../../fileStorage/')
-		var fp = directory + '/' + clientId + '/profile.png'
-		var fileURL = CONTAINERS_URL + clientId + '/download/profile.png'
+		var fp = directory + '/' + clientId.toString() + '/profile.png'
+		var fileURL = CONTAINERS_URL + clientId.toString() + '/download/profile.png'
 
     fs.writeFile(fp, png, function (err) {
       if (err)
         return cb(err, null)
-			writeDataInClientModel(clientId, fileURL, function(err, result) {
+			writeDataInClientModel(clientId.toString(), fileURL, function(err, result) {
 				if (err)
 					return cb(err, null)
 				return cb(null, 'successfuly added sample image')

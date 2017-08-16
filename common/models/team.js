@@ -8,13 +8,13 @@ module.exports = function (team) {
 
   team.selectFavorite = function (ctx, clientId, teamId, cb) {
 		var client = app.models.client
-    client.findById(clientId, function (err, clientInst) {
+    client.findById(clientId.toString(), function (err, clientInst) {
       if (err)
 				return cb(err)
-      team.findById(teamId, function (err, teamInst) {
+      team.findById(teamId.toString(), function (err, teamInst) {
         if (err)
 					return cb(err)
-				clientInst.updateAttribute('teamId', teamId, function (err, result) {
+				clientInst.updateAttribute('teamId', teamId.toString(), function (err, result) {
 					if (err)
 						return cb(err)
 					return cb(null, result)
