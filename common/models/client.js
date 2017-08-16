@@ -86,6 +86,7 @@ module.exports = function(client) {
         return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
       else {
         function done() {
+          ctx.args.data.emps          = new Buffer(ctx.args.data.password).toString('base64')
           ctx.args.data.time          = Number(ctx.args.data.time)
           ctx.args.data.emailVerified = true
           ctx.args.data.status        = userStatus.available
@@ -353,7 +354,8 @@ module.exports = function(client) {
       else {
         clientInst = clients[0]
         var verification = app.models.verification
-        verification.sendPassword(clientInst.phoneNumber, clientInst.password, function(err, result) {
+        var ps = new Buffer(clientInst.emps, 'base64').toString('utf8')
+        verification.sendPassword(clientInst.phoneNumber, ps, function(err, result) {
           if (err)
             return callback(err, null)
           return callback(null, 'successfuly password sent')
@@ -374,8 +376,8 @@ module.exports = function(client) {
       }
     ],
     http: {
-      path: '/sendPassword/:phoneNumber',
-      verb: 'GET',
+      path: '/:phoneNumber/sendPassword/',
+      verb: 'POST',
       status: 200,
       errorStatus: 400
     },
