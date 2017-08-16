@@ -15,12 +15,12 @@ module.exports = function(estimate) {
   estimate.beforeRemote('create', function (ctx, modelInstance, next) {
 		var client = app.models.client
 		var predict = app.models.predict
-		client.findById(ctx.args.data.clientId, function(err, clientInst) {
+		client.findById(ctx.args.data.clientId.toString(), function(err, clientInst) {
 			if (err)
 				return next(err)
 			if (Number(clientInst.accountInfoModel.chances) <= 0)
 				return next(new Error('خطا! فرصت‌های شما برای پیش‌بینی تمام شده‌است'))
-			predict.findById(ctx.args.data.predictId, function(err, predictInst) {
+			predict.findById(ctx.args.data.predictId.toString(), function(err, predictInst) {
 				if (err)
 					return next(err)
 				var time = utility.getUnixTimeStamp()
@@ -28,9 +28,15 @@ module.exports = function(estimate) {
 					return next(new Error('خطا! این پیش‌بینی دیگر باز نیست'))
 				if (!(time >= Number(predictInst.beginningTime) && time <= Number(predictInst.endingTime)))
 					return next(new Error('خطا! دوره زمانی این پیش‌بینی تمام شده‌است'))
-				ctx.args.data.status = statusConfig.open
-				ctx.args.data.point = Number(predictInst.point)
-				return next()	
+				predictInst.leagueRel(function(err, leagueInst) {
+					if (err)
+						return next(err)
+					ctx.args.data.status = statusConfig.open
+					ctx.args.data.point = Number(predictInst.point)
+					ctx.args.data.explanation = predictInst.explanation
+					ctx.args.data.leagueName = leagueInst.name
+					return next()							
+				})
 			})
 		})
 	})
@@ -38,10 +44,10 @@ module.exports = function(estimate) {
   estimate.afterRemote('create', function (ctx, modelInstance, next) {
 		var client = app.models.client
 		var predict = app.models.predict
-		client.findById(modelInstance.clientId, function(err, clientInst) {
+		client.findById(modelInstance.clientId.toString(), function(err, clientInst) {
 			if (err)
 				return next(err)
-			predict.findById(modelInstance.predictId, function(err, predictInst) {
+			predict.findById(modelInstance.predictId.toString(), function(err, predictInst) {
 				if (err)
 					return next(err)
 				var newChances = Number(clientInst.accountInfoModel.chances) - 1
