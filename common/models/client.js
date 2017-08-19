@@ -308,7 +308,8 @@ module.exports = function(client) {
               leagueList[k].predicts({'where':{'status':'Working'}}, function(err, predictsList) {
                 if (err)
                   return callback(err)
-                predictFullArray.concat(predictsList)
+                for (var m = 0; m < predictsList.length; m++)
+                  predictFullArray.push(predictsList[m])
                 counter++
                 if (counter == leagueList.length)
                   gatherData(predictFullArray)
