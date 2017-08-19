@@ -289,21 +289,44 @@ module.exports = function(client) {
         var estimatesIds = []
         for (var i = 0; i < estimatesList.length; i++)
           estimatesIds.push(estimatesList[i].predictId.toString())
+        function gatherData(predictsList) {
+          var res = []
+          for (var i = 0; i < predictsList.length; i++) {
+            if (estimatesIds.indexOf(predictsList[i].id.toString()) <= -1)
+              res.push(predictsList[i])
+          }
+          return callback(null, res)
+        }
         var league = app.models.league
-        league.findById(leagueId.toString(), function(err, leagueInst) {
-          if (err)
-            return callback(err)
-          leagueInst.predicts({'where':{'status':'Working'}}, function(err, predictsList) {
+        if (leagueId === 'every') {
+          league.find(, function(err, leagueList) {
             if (err)
               return callback(err)
-            var res = []
-            for (var i = 0; i < predictsList.length; i++) {
-              if (estimatesIds.indexOf(predictsList[i].id.toString()) <= -1)
-                res.push(predictsList[i])
+            var counter = 0
+            var predictFullArray = []
+            for (var k = 0; k < leagueList.length; k++) {
+              leagueList[k].predicts({'where':{'status':'Working'}}, function(err, predictsList) {
+                if (err)
+                  return callback(err)
+                predictFullArray.concat(predictsList)
+                counter++
+                if (counter == leagueList.length)
+                  gatherData(predictFullArray)
+              })  
             }
-            return callback(null, res)
           })
-        })
+        }
+        else {
+          league.findById(leagueId.toString(), function(err, leagueInst) {
+            if (err)
+              return callback(err)
+            leagueInst.predicts({'where':{'status':'Working'}}, function(err, predictsList) {
+              if (err)
+                return callback(err)
+              gatherData(predictsList)
+            })
+          })            
+        }
       })
 		})
   }
