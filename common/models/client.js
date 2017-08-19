@@ -299,7 +299,7 @@ module.exports = function(client) {
         }
         var league = app.models.league
         if (leagueId === 'every') {
-          league.find(, function(err, leagueList) {
+          league.find(function(err, leagueList) {
             if (err)
               return callback(err)
             var counter = 0
