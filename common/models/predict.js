@@ -164,12 +164,28 @@ module.exports = function(predict) {
 
   predict.afterRemote('create', function (ctx, modelInstance, next) {
 		var league = app.models.league
-		league.findById(ctx.args.data.leagueId.toString(), function(err, leagueInst) {
-			if (err)
-				return next(err)
-			modelInstance.leagueRel(leagueInst)
-			return next()
-		})
+		if(Object.prototype.toString.call(modelInstance) === '[object Array]') {
+			var counter = 0
+			for (var i = 0; i < modelInstance.length; i++) {
+				var model = modelInstance[i]
+				league.findById(model.leagueId.toString(), function(err, leagueInst) {
+					if (err)
+						return next(err)
+					model.leagueRel(leagueInst)
+					counter++
+					if (counter == modelInstance.length)
+						return next()
+				})						
+			}
+		}
+		else {
+			league.findById(modelInstance.leagueId.toString(), function(err, leagueInst) {
+				if (err)
+					return next(err)
+				modelInstance.leagueRel(leagueInst)
+				return next()
+			})	
+		}
 	})
 
   predict.afterRemote('replaceById', function (ctx, modelInstance, next) {
