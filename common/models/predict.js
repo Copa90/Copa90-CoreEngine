@@ -205,18 +205,6 @@ module.exports = function(predict) {
 			return next()
 	})
 
-	predict.afterRemote('deleteById', function (ctx, modelInstance, next) {
-		if (modelInstance.estimates.length > 0) {
-			modelInstance.estimates.destroyAll(function(err, result) {
-				if (err)
-					return next(err)
-				return next()
-			})
-		}
-		else 
-			return next()
-	})
-
   predict.finalizePredict = function (predictId, occurrence, callback) {
 		var ocr = Number(occurrence)
 		predict.findById(predictId.toString(), function(err, modelInstance) {
