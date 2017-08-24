@@ -25,6 +25,11 @@
       "type": "number",
       "required": true,
       "default": 0
+    },
+    "totalChoices": {
+      "type": "number",
+      "required": true,
+      "default": 0
     }
   },
   "validations": [],

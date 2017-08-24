@@ -96,6 +96,7 @@ module.exports = function(client) {
           ctx.args.data.accountInfoModel.roundWins 	    = 0
           ctx.args.data.accountInfoModel.totalPoints    = 0
           ctx.args.data.accountInfoModel.totalEstimates = 0
+          ctx.args.data.accountInfoModel.totalChoices = 0
           ctx.args.data.referralModel = {}
           ctx.args.data.referralModel.clients = []
           ctx.args.data.trophyModel 	= {}
@@ -177,6 +178,8 @@ module.exports = function(client) {
         ctx.args.data.totalPoints += Number(result.accountInfoModel.totalPoints)
 			if (ctx.args.data.totalEstimates)
         ctx.args.data.totalEstimates += Number(result.accountInfoModel.totalEstimates)
+			if (ctx.args.data.totalChoices)
+        ctx.args.data.totalChoices += Number(result.accountInfoModel.totalChoices)
       return next()
     })
   })

@@ -96,6 +96,11 @@
       "model": "estimate",
       "foreignKey": "clientId"
     },
+    "choices": {
+      "type": "hasMany",
+      "model": "choice",
+      "foreignKey": "clientId"
+    },
     "champions": {
       "type": "hasMany",
       "model": "champion",
@@ -151,6 +156,12 @@
       "principalId": "$owner",
       "permission": "ALLOW",
       "property": "__get__estimates"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "__get__choices"
     },
     {
       "principalType": "ROLE",
