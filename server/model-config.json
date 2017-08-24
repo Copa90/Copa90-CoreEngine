@@ -107,5 +107,9 @@
   "award": {
     "dataSource": null,
     "public": true
+  "exact": {
+    "dataSource": "mongoDs",
+    "public": true
+  },
   }
 }
