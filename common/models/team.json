@@ -21,6 +21,11 @@
       "type": "hasMany",
       "model": "client",
       "foreignKey": "teamId"
+    },
+    "players": {
+      "type": "hasMany",
+      "model": "player",
+      "foreignKey": "teamId"
     }
   },
   "acls": [
