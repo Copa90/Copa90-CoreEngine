@@ -1,5 +1,6 @@
 {
 	"topScorer": "TopScorer",
 	"champion": "Champion",
-	"runnerUp": "RunnerUp"
+	"runnerUp": "RunnerUp",
+	"topAssist": "TopAssist"
 }
