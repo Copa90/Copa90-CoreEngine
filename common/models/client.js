@@ -20,6 +20,8 @@ var relationMethodPrefixes = [
 
 var userStatus = require('../../config/userStatus.json')
 
+var persianize = require('persianize')
+
 module.exports = function(client) {
 
 	var dailyPredict = cron.job("00 00 00 * * 1-7", function () {
@@ -43,6 +45,10 @@ module.exports = function(client) {
 
 	methodDisabler.disableOnlyTheseMethods(client, relationMethodPrefixes)
 	client.validatesLengthOf('password', {min: 6})
+  client.validatesUniquenessOf('username', {
+    message: 'خطا! نام کاربری وارد شده قبلا در سیستم ثبت شده است'
+  });
+
 
   client.beforeRemote('login', function (ctx, modelInstance, next) {
     if (PRODUCTION) {
@@ -87,6 +93,12 @@ module.exports = function(client) {
         return next(new Error('White List Error! Allowed Parameters: ' + whiteList.toString()))
       else {
         function done() {
+          if (ctx.args.data.fullname) {
+            if (persianize.validator().text(ctx.args.data.fullname)) 
+              ctx.args.data.fullname = persianize.convert().all(ctx.args.data.fullname).get()
+            else
+              return next(new Error('خطا! نام و نام‌خانوادگی شما باید فارسی وارد شود'))
+          }
           ctx.args.data.emps          = new Buffer(ctx.args.data.password).toString('base64')
           ctx.args.data.time          = Number(ctx.args.data.time)
           ctx.args.data.emailVerified = true
