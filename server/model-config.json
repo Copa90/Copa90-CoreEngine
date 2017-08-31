@@ -115,5 +115,9 @@
   "choice": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "player": {
+    "dataSource": "mongoDs",
+    "public": true
   }
 }

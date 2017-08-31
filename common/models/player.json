@@ -1,0 +1,37 @@
+{
+  "name": "player",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "team": {
+      "type": "string",
+      "required": true
+    },
+    "league": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "leagueRel": {
+      "type": "belongsTo",
+      "model": "league",
+      "foreignKey": "leagueId"
+    },
+    "teamRel": {
+      "type": "belongsTo",
+      "model": "team",
+      "foreignKey": "teamId"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}
