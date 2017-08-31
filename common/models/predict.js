@@ -153,11 +153,20 @@ module.exports = function(predict) {
 			if (err)
 				console.error(err)
 			for (var i = 0; i < predictList.length; i++) {
-				if (Number(predictList[i].endingTime) <= time) {
-					predictList[i].updateAttribute('status', statusConfig.closed, function (err, predictInst) {
-						if (err)
-							console.error(err)
-					})
+				var model = predictList[i]
+				if (Number(model.endingTime) <= time) {
+					if (model.tag === tagConfig.mock) {
+						model.destroy(function(err) {
+							if (err)
+								console.error(err)
+						})
+					}
+					else {
+						model.updateAttribute('status', statusConfig.closed, function (err, predictInst) {
+							if (err)
+								console.error(err)
+						})	
+					}
 				}
 			}
 		})
