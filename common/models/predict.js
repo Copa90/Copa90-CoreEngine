@@ -29,10 +29,11 @@ module.exports = function(predict) {
 			var time = utility.getUnixTimeStamp()
 			var counter3 = 0
 			for (var i = 0; i < estimateList.length; i++) {
+				var estimateInst = estimateList[i]
 				var status = estimateStatusConfig.lose
 				if (predictInstance.occurrence == 1)
 					status = estimateStatusConfig.win
-				estimateList[i].updateAttributes({'status': status, 'checkTime': time}, function(err, updateInstance) {
+				estimateInst.updateAttributes({'status': status, 'checkTime': time}, function(err, updateInstance) {
 					if (err)
 						return cb(err)
 					if (predictInstance.occurrence == 1) {
@@ -60,8 +61,9 @@ module.exports = function(predict) {
 												return cb1(null)
 											var counter1 = 0
 											for (var j = 0; j < rankingList.length; j++) {
-												var innerPoints = Number(rankingList[j].points) + Number(predictInstance.point)
-												rankingList[j].updateAttribute('points', innerPoints, function(err, res) {
+												var rankInst = rankingList[j]
+												var innerPoints = Number(rankInst.points) + Number(predictInstance.point)
+												rankInst.updateAttribute('points', innerPoints, function(err, res) {
 													counter1++
 													if (err)
 														return cb1(err)
@@ -80,8 +82,9 @@ module.exports = function(predict) {
 												return cb2(null)
 											var counter2 = 0
 											for (var j = 0; j < competitionList.length; j++) {
-												var innerPoints = Number(competitionList[j].points) + Number(predictInstance.point)
-												competitionList[j].updateAttribute('points', innerPoints, function(err, res) {
+												var compInst = competitionList[j]
+												var innerPoints = Number(compInst.points) + Number(predictInstance.point)
+												compInst.updateAttribute('points', innerPoints, function(err, res) {
 													counter2++
 													if (err)
 														return cb2(err)
@@ -129,8 +132,9 @@ module.exports = function(predict) {
 			if (err)
 				console.error(err)
 			for (var i = 0; i < predictList.length; i++) {
-				if (Number(predictList[i].beginningTime) <= time && Number(predictList[i].endingTime) >= time) {
-					predictList[i].updateAttribute('status', statusConfig.working, function (err, predictInst) {
+				var model = predictList[i]
+				if (Number(model.beginningTime) <= time && Number(model.endingTime) >= time) {
+					model.updateAttribute('status', statusConfig.working, function (err, predictInst) {
 						if (err)
 							console.error(err)
 					})

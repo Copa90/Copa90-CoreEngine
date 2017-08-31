@@ -37,42 +37,43 @@ module.exports = function(exact) {
 			var time = utility.getUnixTimeStamp()
 			var counter3 = 0
 			for (var i = 0; i < choiceList.length; i++) {
+				var choiceInst = choiceList[i]
 				var point = 0
 				var data = {
 					'checkTime': time
 				}
 				data.status = choiceStatusConfig.lose
-				if (choiceList[i].firstOption) {
-					if (choiceList[i].firstOption.choice === exactInstance.answer) {
-						point = Number(choiceList[i].firstOption.point)
+				if (choiceInst.firstOption) {
+					if (choiceInst.firstOption.choice === exactInstance.answer) {
+						point = Number(choiceInst.firstOption.point)
 						data.status = choiceStatusConfig.win
-						choiceList[i].firstOption.status = choiceStatusConfig.win
-						choiceList[i].secondOption.status = choiceStatusConfig.lose
-						choiceList[i].thirdOption.status = choiceStatusConfig.lose
+						choiceInst.firstOption.status = choiceStatusConfig.win
+						choiceInst.secondOption.status = choiceStatusConfig.lose
+						choiceInst.thirdOption.status = choiceStatusConfig.lose
 					}	
 				}
-				else if (choiceList[i].secondOption) {
-					if (choiceList[i].secondOption.choice === exactInstance.answer) {
-						point = Number(choiceList[i].secondOption.point)
+				else if (choiceInst.secondOption) {
+					if (choiceInst.secondOption.choice === exactInstance.answer) {
+						point = Number(choiceInst.secondOption.point)
 						data.status = choiceStatusConfig.win
-						choiceList[i].secondOption.status = choiceStatusConfig.win
-						choiceList[i].firstOption.status = choiceStatusConfig.lose
-						choiceList[i].thirdOption.status = choiceStatusConfig.lose
+						choiceInst.secondOption.status = choiceStatusConfig.win
+						choiceInst.firstOption.status = choiceStatusConfig.lose
+						choiceInst.thirdOption.status = choiceStatusConfig.lose
 					}	
 				}
-				else if (choiceList[i].thirdOption.choice) {
-					if (choiceList[i].thirdOption.choice === exactInstance.answer) {
-						point = Number(choiceList[i].thirdOption.point)
+				else if (choiceInst.thirdOption.choice) {
+					if (choiceInst.thirdOption.choice === exactInstance.answer) {
+						point = Number(choiceInst.thirdOption.point)
 						data.status = choiceStatusConfig.win
-						choiceList[i].thirdOption.status = choiceStatusConfig.win
-						choiceList[i].secondOption.status = choiceStatusConfig.lose
-						choiceList[i].firstOption.status = choiceStatusConfig.lose
+						choiceInst.thirdOption.status = choiceStatusConfig.win
+						choiceInst.secondOption.status = choiceStatusConfig.lose
+						choiceInst.firstOption.status = choiceStatusConfig.lose
 					}	
 				}
-				data.firstOption = choiceList[i].firstOption
-				data.secondOption = choiceList[i].secondOption
-				data.thirdOption = choiceList[i].thirdOption
-				choiceList[i].updateAttributes(data, function(err, updateInstance) {
+				data.firstOption = choiceInst.firstOption
+				data.secondOption = choiceInst.secondOption
+				data.thirdOption = choiceInst.thirdOption
+				choiceInst.updateAttributes(data, function(err, updateInstance) {
 					if (err)
 						return cb(err)
 					if (updateInstance.status === choiceStatusConfig.win) {
@@ -100,8 +101,9 @@ module.exports = function(exact) {
 												return cb1(null)
 											var counter1 = 0
 											for (var j = 0; j < rankingList.length; j++) {
-												var innerPoints = Number(rankingList[j].points) + point
-												rankingList[j].updateAttribute('points', innerPoints, function(err, res) {
+												var rankInst = rankingList[j]
+												var innerPoints = Number(rankInst.points) + point
+												rankInst.updateAttribute('points', innerPoints, function(err, res) {
 													counter1++
 													if (err)
 														return cb1(err)
@@ -120,8 +122,9 @@ module.exports = function(exact) {
 												return cb2(null)
 											var counter2 = 0
 											for (var j = 0; j < competitionList.length; j++) {
-												var innerPoints = Number(competitionList[j].points) + point
-												competitionList[j].updateAttribute('points', innerPoints, function(err, res) {
+												var compInst = competitionList[j]
+												var innerPoints = Number(compInst.points) + point
+												compInst.updateAttribute('points', innerPoints, function(err, res) {
 													counter2++
 													if (err)
 														return cb2(err)
@@ -169,8 +172,9 @@ module.exports = function(exact) {
 			if (err)
 				console.error(err)
 			for (var i = 0; i < exactList.length; i++) {
-				if (Number(exactList[i].beginningTime) <= time && Number(exactList[i].endingTime) >= time) {
-					exactList[i].updateAttribute('status', statusConfig.working, function (err, exactInst) {
+				var exactInst = exactList[i]
+				if (Number(exactInst.beginningTime) <= time && Number(exactList[i].endingTime) >= time) {
+					exactInst.updateAttribute('status', statusConfig.working, function (err, exactInst) {
 						if (err)
 							console.error(err)
 					})
@@ -189,8 +193,9 @@ module.exports = function(exact) {
 			if (err)
 				console.error(err)
 			for (var i = 0; i < exactList.length; i++) {
-				if (Number(exactList[i].endingTime) <= time) {
-					exactList[i].updateAttribute('status', statusConfig.closed, function (err, exactInst) {
+				var exactInst = exactList[i]
+				if (Number(exactInst.endingTime) <= time) {
+					exactInst.updateAttribute('status', statusConfig.closed, function (err, exactInst) {
 						if (err)
 							console.error(err)
 					})

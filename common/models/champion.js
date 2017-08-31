@@ -23,9 +23,10 @@ module.exports = function(champion) {
 					var totalPerson = []
 					var personList = []
 					for (var j = 0; j < rankingList.length; j++) {
-						totalPoint += Number(rankingList[j].points)
-						if (totalPerson.indexOf(rankingList[j].clientId.toString()) <= -1)
-							totalPerson.push(rankingList[j].clientId.toString())
+						var rankModel = rankingList[j]
+						totalPoint += Number(rankModel.points)
+						if (totalPerson.indexOf(rankModel.clientId.toString()) <= -1)
+							totalPerson.push(rankModel.clientId.toString())
 					}
 					totalPerson = personList.length
 					var period = time - Number(championInst.beginningTime)

@@ -27,10 +27,11 @@ module.exports = function(client) {
       if (err)
         return console.error(err)
       for (var i = 0; i < clientList.length; i++) {
-        if (!clientList[i].accountInfoModel)
+        var clientInst = clientList[i]
+        if (!clientInst.accountInfoModel)
           continue
-        var newChances = Number(clientList[i].accountInfoModel.chances) + 1
-        clientList[i].accountInfo.update({'chances': newChances}, function(err, result) {
+        var newChances = Number(model.accountInfoModel.chances) + 1
+        model.accountInfo.update({'chances': newChances}, function(err, result) {
           if (err)
             return console.error(err)
         })
@@ -308,7 +309,8 @@ module.exports = function(client) {
             var counter = 0
             var predictFullArray = []
             for (var k = 0; k < leagueList.length; k++) {
-              leagueList[k].predicts({'where':{'status':'Working'}}, function(err, predictsList) {
+              var leagueInst = leagueList[k]
+              leagueInst.predicts({'where':{'status':'Working'}}, function(err, predictsList) {
                 if (err)
                   return callback(err)
                 for (var m = 0; m < predictsList.length; m++)

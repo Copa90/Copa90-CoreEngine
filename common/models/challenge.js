@@ -17,8 +17,9 @@ module.exports = function(challenge) {
 			if (err)
 				console.error(err)
 			for (var i = 0; i < challengeList.length; i++) {
-				if (Number(challengeList[i].endingTime) <= time) {
-					challengeList[i].updateAttribute('status', statusConfig.finished, function (err, challengeInst) {
+				var model = challengeList[i]
+				if (Number(model.endingTime) <= time) {
+					model.updateAttribute('status', statusConfig.finished, function (err, challengeInst) {
 						if (err)
 							console.error(err)
 						var competition = app.models.competition

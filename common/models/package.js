@@ -28,8 +28,9 @@ module.exports = function(package) {
 			if (err)
 				console.error(err)
 			for (var i = 0; i < packageList.length; i++) {
-				if (Number(packageList[i].beginningTime) <= time && Number(packageList[i].endingTime) >= time) {
-					packageList[i].updateAttribute('status', statusConfig.working, function (err, packageInst) {
+				var packageInst = packageList[i]
+				if (Number(packageInst.beginningTime) <= time && Number(packageInst.endingTime) >= time) {
+					packageInst.updateAttribute('status', statusConfig.working, function (err, packageInst) {
 						if (err)
 							console.error(err)
 					})
@@ -48,8 +49,9 @@ module.exports = function(package) {
 			if (err)
 				console.error(err)
 			for (var i = 0; i < packageList.length; i++) {
-				if (Number(packageList[i].endingTime) <= time) {
-					packageList[i].updateAttribute('status', statusConfig.finished, function (err, packageInst) {
+				var packageInst = packageList[i]
+				if (Number(packageInst.endingTime) <= time) {
+					packageInst.updateAttribute('status', statusConfig.finished, function (err, packageInst) {
 						if (err)
 							console.error(err)
 					})
