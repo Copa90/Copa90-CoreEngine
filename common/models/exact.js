@@ -221,16 +221,13 @@ module.exports = function(exact) {
 				if (Number(model.beginningTime) + (6 * 24 * 60 * 60 * 1000) >= time) {
 					var passed = (time - Number(model.beginningTime))
 					var coeff = ((Number(model.endingTime) - passed) / Number(model.endingTime))
-					var firstPoint = (coeff * Number(model.point))
-					var secondPoint = (coeff * Number(model.point) * 0.7)
-					var thirdPoint = (coeff * Number(model.point) * 0.4)
 					for (var i = 0; i < model.selectors.length; i++) {
-						if (model.selectors[i].priority === choicePriorityConfig.high) 
-							model.selectors[i].point = firstPoint
-						else if (model.selectors[i].priority === choicePriorityConfig.average) 
-							model.selectors[i].point = secondPoint
-						else if (model.selectors[i].priority === choicePriorityConfig.low) 
-							model.selectors[i].point = thirdPoint
+						var firstPoint = (coeff * Number(model.selectors[i].point.first))
+						var secondPoint = (coeff * Number(model.selectors[i].point.second) * 0.7)
+						var thirdPoint = (coeff * Number(model.selectors[i].point.third) * 0.4)
+						model.selectors[i].point.first = firstPoint
+						model.selectors[i].point.second = secondPoint
+						model.selectors[i].point.third = thirdPoint
 					}
 					model.updateAttribute('selectors', model.selectors, function (err, exactInst) {
 						if (err)
@@ -246,17 +243,15 @@ module.exports = function(exact) {
   exact.beforeRemote('create', function (ctx, modelInstance, next) {
 		for (var i = 0; i < ctx.args.data.selectors.length; i++) {
 			var model = ctx.args.data.selectors[i]
-			if (!model["option"] || !model["priority"])
+			if (!model["choice"] || !model["point"])
 				return next(new Error('خطا! مدل نمونه پاسخ کامل نیست'))
+			if (!model.point["first"] || !model.point["second"] || !model.point["third"])
+				return next(new Error('خطا! مدل نمونه امتیازات کامل نیست'))
 		}
 		for (var i = 0; i < ctx.args.data.selectors.length; i++) {
-			var model = ctx.args.data.selectors[i]
-			if (model["priority"] === choicePriorityConfig.high)
-				ctx.args.data.selectors[i].point = Number(ctx.args.data.point)
-			else if (model["priority"] === choicePriorityConfig.average)
-				ctx.args.data.selectors[i].point = (Number(ctx.args.data.point) * 0.7)
-			else if (model["priority"] === choicePriorityConfig.low)
-				ctx.args.data.selectors[i].point = (Number(ctx.args.data.point) * 0.4)
+			ctx.args.data.selectors[i].point.first = Number(ctx.args.data.selectors[i].point.first)
+			ctx.args.data.selectors[i].point.second = Number(ctx.args.data.selectors[i].point.second)
+			ctx.args.data.selectors[i].point.third = Number(ctx.args.data.selectors[i].point.third)
 		}
 		return next()
 	})

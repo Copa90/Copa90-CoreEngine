@@ -6,12 +6,12 @@
     "validateUpsert": true
   },
   "properties": {
-    "topic": {
+    "name": {
       "type": "string",
       "required": true
     },
-    "point": {
-      "type": "number",
+    "topic": {
+      "type": "string",
       "required": true
     },
     "beginningTime": {
@@ -72,6 +72,12 @@
       "principalType": "ROLE",
       "principalId": "admin",
       "permission": "ALLOW"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "find"
     }
   ],
   "methods": {}
