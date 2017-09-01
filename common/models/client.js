@@ -32,8 +32,8 @@ module.exports = function(client) {
         var clientInst = clientList[i]
         if (!clientInst.accountInfoModel)
           continue
-        var newChances = Number(model.accountInfoModel.chances) + 1
-        model.accountInfo.update({'chances': newChances}, function(err, result) {
+        var newChances = Number(clientInst.accountInfoModel.chances) + 1
+        clientInst.accountInfo.update({'chances': newChances}, function(err, result) {
           if (err)
             return console.error(err)
         })

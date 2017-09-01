@@ -173,8 +173,8 @@ module.exports = function(exact) {
 				console.error(err)
 			for (var i = 0; i < exactList.length; i++) {
 				var exactInst = exactList[i]
-				if (Number(exactInst.beginningTime) <= time && Number(exactList[i].endingTime) >= time) {
-					exactInst.updateAttribute('status', statusConfig.working, function (err, exactInst) {
+				if (Number(exactInst.beginningTime) <= time && Number(exactInst.endingTime) >= time) {
+					exactInst.updateAttribute('status', statusConfig.working, function (err, exactInstante) {
 						if (err)
 							console.error(err)
 					})
@@ -195,7 +195,7 @@ module.exports = function(exact) {
 			for (var i = 0; i < exactList.length; i++) {
 				var exactInst = exactList[i]
 				if (Number(exactInst.endingTime) <= time) {
-					exactInst.updateAttribute('status', statusConfig.closed, function (err, exactInst) {
+					exactInst.updateAttribute('status', statusConfig.closed, function (err, exactInstante) {
 						if (err)
 							console.error(err)
 					})

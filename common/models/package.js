@@ -30,7 +30,7 @@ module.exports = function(package) {
 			for (var i = 0; i < packageList.length; i++) {
 				var packageInst = packageList[i]
 				if (Number(packageInst.beginningTime) <= time && Number(packageInst.endingTime) >= time) {
-					packageInst.updateAttribute('status', statusConfig.working, function (err, packageInst) {
+					packageInst.updateAttribute('status', statusConfig.working, function (err, packageInstante) {
 						if (err)
 							console.error(err)
 					})
@@ -51,7 +51,7 @@ module.exports = function(package) {
 			for (var i = 0; i < packageList.length; i++) {
 				var packageInst = packageList[i]
 				if (Number(packageInst.endingTime) <= time) {
-					packageInst.updateAttribute('status', statusConfig.finished, function (err, packageInst) {
+					packageInst.updateAttribute('status', statusConfig.finished, function (err, packageInstant) {
 						if (err)
 							console.error(err)
 					})
