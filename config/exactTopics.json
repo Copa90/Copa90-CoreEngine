@@ -2,5 +2,6 @@
 	"topScorer": "TopScorer",
 	"champion": "Champion",
 	"runnerUp": "RunnerUp",
-	"topAssist": "TopAssist"
+	"topAssist": "TopAssist",
+	"firstFiredCoach": "FirstFiredCoach"
 }
