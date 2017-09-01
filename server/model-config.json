@@ -119,5 +119,9 @@
   "player": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "coach": {
+    "dataSource": "mongoDs",
+    "public": true
   }
 }
