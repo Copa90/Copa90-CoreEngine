@@ -12,7 +12,7 @@
     },
     "team": {
       "type": "string",
-      "required": true
+      "required": false
     },
     "league": {
       "type": "string",
@@ -32,6 +32,24 @@
       "foreignKey": "teamId"
     }
   },
-  "acls": [],
+  "acls": [
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY"
+    },
+    {
+      "accessType": "*",
+      "principalType": "ROLE",
+      "principalId": "founder",
+      "permission": "ALLOW"
+    },
+    {
+      "accessType": "*",
+      "principalType": "ROLE",
+      "principalId": "admin",
+      "permission": "ALLOW"
+    }
+  ],
   "methods": {}
 }
