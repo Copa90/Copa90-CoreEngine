@@ -27,6 +27,11 @@
       "type": "hasMany",
       "model": "player",
       "foreignKey": "leagueId"
+    },
+    "coaches": {
+      "type": "hasMany",
+      "model": "coach",
+      "foreignKey": "leagueId"
     }
   },
   "acls": [

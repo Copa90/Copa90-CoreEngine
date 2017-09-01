@@ -26,6 +26,11 @@
       "type": "hasMany",
       "model": "player",
       "foreignKey": "teamId"
+    },
+    "coachRel": {
+      "type": "hasOne",
+      "model": "coach",
+      "foreignKey": "teamId"
     }
   },
   "acls": [
