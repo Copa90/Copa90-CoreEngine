@@ -30,6 +30,15 @@
       "type": "number",
       "required": true,
       "default": 0
+    },
+    "dailyAward": {
+      "type": "string",
+      "required": true,
+      "default": "true"
+    },
+    "lastLogin": {
+      "type": "number",
+      "required": false
     }
   },
   "validations": [],

@@ -32,8 +32,7 @@ module.exports = function(client) {
         var clientInst = clientList[i]
         if (!clientInst.accountInfoModel)
           continue
-        var newChances = Number(clientInst.accountInfoModel.chances) + 1
-        clientInst.accountInfo.update({'chances': newChances}, function(err, result) {
+        clientInst.accountInfo.update({'dailyAward': "false"}, function(err, result) {
           if (err)
             return console.error(err)
         })
@@ -49,7 +48,6 @@ module.exports = function(client) {
     message: 'خطا! نام کاربری وارد شده قبلا در سیستم ثبت شده است'
   });
 
-
   client.beforeRemote('login', function (ctx, modelInstance, next) {
     if (PRODUCTION) {
       var pass1 = utility.base64Decoding(ctx.args.credentials.password).toString()
@@ -61,15 +59,56 @@ module.exports = function(client) {
       ctx.args.credentials.email 	= ctx.args.credentials.email.toLowerCase()
       ctx.req.body.email 					= ctx.req.body.email.toLowerCase()
     }
-    client.find({where:{phoneNumber: ctx.args.credentials.phoneNumber}}, function(err, results) {
+    if (ctx.args.credentials.phoneNumber) {
+      client.find({where:{phoneNumber: ctx.args.credentials.phoneNumber}}, function(err, results) {
+        if (err)
+          return next(err)
+        if (results.length == 0)
+          return next(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
+        var clientInst = results[0]
+        ctx.args.credentials.email 	= clientInst.email.toLowerCase()
+        ctx.req.body.email 					= clientInst.email.toLowerCase()
+        return next()
+      })  
+    }
+    else {
+      next()
+    }
+  })
+
+  client.afterRemote('login', function (ctx, modelInstance, next) {
+    client.findById(modelInstance.userId, function(err, clientInst) {
       if (err)
         return next(err)
-      if (results.length == 0)
-        return next(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
-      var clientInst = results[0]
-      ctx.args.credentials.email 	= clientInst.email.toLowerCase()
-      ctx.req.body.email 					= clientInst.email.toLowerCase()
-      return next()
+      if (clientInst.phoneNumber === '09120001122')
+        return next()
+      if (clientInst.accountInfoModel.lastLogin == 0) {
+        clientInst.accountInfo.update({'dailyAward': "true", 'lastLogin': utility.getUnixTimeStamp()}, function(err, result) {
+          if (err)
+            return next(err)
+          return next()
+        })
+      }
+      else {
+        function updateLoginDate() {
+          clientInst.accountInfo.update({'lastLogin': utility.getUnixTimeStamp()}, function(err, result) {
+            if (err)
+              return next(err)
+            return next()
+          })
+        }
+        if (clientInst.accountInfoModel.dailyAward === 'false') {
+          var newChances = clientInst.accountInfoModel.chances + 1
+          clientInst.accountInfo.update({'dailyAward': "true", 'chances': newChances}, function(err, result) {
+            if (err)
+              return next(err)
+            return next()
+          })
+        }
+        else {
+          return next()
+        }  
+      }
     })
   })
 
@@ -109,7 +148,9 @@ module.exports = function(client) {
           ctx.args.data.accountInfoModel.roundWins 	    = 0
           ctx.args.data.accountInfoModel.totalPoints    = 0
           ctx.args.data.accountInfoModel.totalEstimates = 0
-          ctx.args.data.accountInfoModel.totalChoices = 0
+          ctx.args.data.accountInfoModel.totalChoices   = 0
+          ctx.args.data.accountInfoModel.dailyAward     = "true"
+          ctx.args.data.accountInfoModel.lastLogin      = 0
           ctx.args.data.referralModel = {}
           ctx.args.data.referralModel.clients = []
           ctx.args.data.trophyModel 	= {}
