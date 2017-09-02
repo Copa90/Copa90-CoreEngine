@@ -14,17 +14,4 @@ function randomNonEqualChance(table, number) {
 
 module.exports = function(award) {
 
-	var monthlyAward = cron.job("0 0 0 1 * *", function () {
-
-
-		
-	})
-
-	monthlyAward.start()
-
-	var weeklyAward = cron.job("0 0 0 * * 0", function () {
-
-	})
-
-	weeklyAward.start()
 }
