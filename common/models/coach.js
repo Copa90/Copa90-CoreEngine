@@ -7,7 +7,7 @@ module.exports = function(coach) {
 				var model = ctx.args.data[i]
 				if (!model.teamId)
 					return next()
-				var name = model.team + ' - ' + model.name
+				var name = model.name + ' - ' + model.team
 				model.name = name
 				counter++
 				if (counter == ctx.args.data.length)
