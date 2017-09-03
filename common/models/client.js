@@ -469,4 +469,47 @@ module.exports = function(client) {
     }
   })
 
+  client.statistics = function (callback) {
+		var filter = {
+			skip: '6',
+			fields: {
+				'email': 'false',
+				'time': 'false',
+				'phoneNumber': 'false',
+				'emailVerified': 'false',
+				'trophyModel': 'false',
+				'teamId': 'false',
+				'referralModel': 'false',
+				'checkpointModel': 'false',
+				'emps': 'false',
+				'status': 'false',
+				'profilePath': 'false',
+				'accountInfoModel': 'true',
+				'username': 'true',
+				'fullname': 'true',
+				'id': 'true'
+			}
+		}
+    client.find(filter, function(err, clients) {
+      if (err)
+        return callback(err)
+      return callback(null, clients)
+    })
+  }
+
+  client.remoteMethod('statistics', {
+    description: 'get all statistics information of all clients',
+    accepts: [],
+    http: {
+      path: '/statistics',
+      verb: 'GET',
+      status: 200,
+      errorStatus: 400
+    },
+    returns: {
+			type: 'object',
+			root: true
+    }
+  })
+
 }
