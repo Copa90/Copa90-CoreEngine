@@ -38,7 +38,7 @@ module.exports = function(choice) {
 				exactInst.leagueRel(function(err, leagueInst) {
 					if (err)
 						return next(err)
-					exactInst.choices({'clientId': ctx.args.data.clientId}, function(err, userExactChoices) {
+					exactInst.choices({'where':{'clientId': ctx.args.data.clientId.toString()}}, function(err, userExactChoices) {
 						if (err)
 							return next(err)
 						if (userExactChoices.length == 0) {
