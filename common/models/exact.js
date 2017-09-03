@@ -264,6 +264,17 @@ module.exports = function(exact) {
 		})	
 	})
 
+	exact.beforeRemote('replaceById', function (ctx, modelInstance, next) {
+		if (ctx.args.data.answer !== '') {
+			if (ctx.args.data.status === statusConfig.working || ctx.args.data.status === statusConfig.closed) 
+				next()
+			else
+				next(new Error('Cant do Finalize'))
+		}
+		else 
+			next()
+	})
+
   exact.afterRemote('replaceById', function (ctx, modelInstance, next) {
 		if ((modelInstance.status === statusConfig.working || modelInstance.status === statusConfig.closed) && (modelInstance.answer && modelInstance.answer !== '')) {
 			var client = app.models.client
