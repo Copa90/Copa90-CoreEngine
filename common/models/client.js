@@ -82,7 +82,7 @@ module.exports = function(client) {
         return next(err)
       if (clientInst.phoneNumber === '09120001122')
         return next()
-      if (clientInst.accountInfoModel.lastLogin == 0) {
+      if (clientInst.accountInfoModel.lastLogin == 0 || !clientInst.accountInfoModel.lastLogin) {
         clientInst.accountInfo.update({'dailyAward': "true", 'lastLogin': utility.getUnixTimeStamp()}, function(err, result) {
           if (err)
             return next(err)
@@ -102,11 +102,11 @@ module.exports = function(client) {
           clientInst.accountInfo.update({'dailyAward': "true", 'chances': newChances}, function(err, result) {
             if (err)
               return next(err)
-            return next()
+            updateLoginDate()
           })
         }
         else {
-          return next()
+          updateLoginDate()
         }  
       }
     })
