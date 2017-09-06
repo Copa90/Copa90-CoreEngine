@@ -123,5 +123,9 @@
   "coach": {
     "dataSource": "mongoDs",
     "public": true
+  },
+  "notification": {
+    "dataSource": "mongoDs",
+    "public": true
   }
 }
