@@ -46,7 +46,10 @@ module.exports = function(client) {
 	client.validatesLengthOf('password', {min: 6})
   client.validatesUniquenessOf('username', {
     message: 'خطا! نام کاربری وارد شده قبلا در سیستم ثبت شده است'
-  });
+  })
+  client.validatesUniquenessOf('email', {
+    message: 'خطا! ایمیل وارد شده قبلا در سیستم ثبت شده است'
+  })
 
   client.beforeRemote('login', function (ctx, modelInstance, next) {
     if (PRODUCTION) {
