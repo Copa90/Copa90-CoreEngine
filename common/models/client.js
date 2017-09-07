@@ -190,6 +190,8 @@ module.exports = function(client) {
           client.findById(modelInstance.referrer.toString(), function(err, referrerInst) {
             if (err)
               return next(err)
+            if (referrerInst)
+              return next()
             if (referrerInst.referralModel.clients.length >= 10) {
               return next()
             }
