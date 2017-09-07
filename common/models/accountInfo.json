@@ -9,7 +9,7 @@
     "chances": {
       "type": "number",
       "required": true,
-      "default": 10
+      "default": 25
     },
     "roundWins": {
       "type": "number",
