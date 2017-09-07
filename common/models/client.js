@@ -176,6 +176,7 @@ module.exports = function(client) {
     })
   })
 
+  /*
   client.afterRemote('create', function (ctx, modelInstance, next) {
     var option = {}
     option.name = '' + modelInstance.id.toString()
@@ -222,6 +223,7 @@ module.exports = function(client) {
       })
     })
   })
+  */
 
   client.beforeRemote('prototype.__update__accountInfo', function (ctx, modelInstance, next) {
     if (!ctx.args.options.accessToken)
