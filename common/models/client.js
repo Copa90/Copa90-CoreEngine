@@ -480,21 +480,21 @@ module.exports = function(client) {
 		var filter = {
 			skip: '6',
 			fields: {
-				'email': 'false',
-				'time': 'false',
-				'phoneNumber': 'false',
-				'emailVerified': 'false',
-				'trophyModel': 'false',
-				'teamId': 'false',
-				'referralModel': 'false',
-				'checkpointModel': 'false',
-				'emps': 'false',
-				'status': 'false',
-				'profilePath': 'false',
-				'accountInfoModel': 'true',
-				'username': 'true',
-				'fullname': 'true',
-				'id': 'true'
+				'email': false,
+				'time': false,
+				'phoneNumber': false,
+				'emailVerified': false,
+				'trophyModel': false,
+				'teamId': false,
+				'referralModel': false,
+				'checkpointModel': false,
+				'emps': false,
+				'status': false,
+				'profilePath': false,
+				'accountInfoModel': true,
+				'username': true,
+				'fullname': true,
+				'id': true
 			}
 		}
     client.find(filter, function(err, clients) {

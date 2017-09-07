@@ -200,6 +200,12 @@
       "property": "statistics"
     },
     {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "find"
+    },
+    {
       "accessType": "*",
       "principalType": "ROLE",
       "principalId": "founder",
