@@ -48,6 +48,8 @@ module.exports = function(champion) {
 		client.findById(ctx.args.data.creatorId.toString(), function(err, clientInst) {
 			if (err)
 				return next(err)
+			if (!clientInst)
+				return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
 			if (ctx.args.data.capacity < 2)
 				return next(new Error('خطا! ظرفیت لیگ خصوصی نباید کمتر از ۲ نفر باشد'))
 			ctx.args.data.beginningTime = time
@@ -61,6 +63,8 @@ module.exports = function(champion) {
 		client.findById(modelInstance.creatorId.toString(), function(err, clientInst) {
 			if (err)
 				return next(err)
+			if (!clientInst)
+				return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
 			modelInstance.clients.add(clientInst, function(err, result) {
 				if (err)
 					return next(err)
@@ -79,6 +83,8 @@ module.exports = function(champion) {
 				champion.findById(ctx.req.params.id.toString(), function(err, championInst) {
 					if (err)
 						return next(err)
+					if (!championInst)
+						return callback(new Error('خطا! لیگ خصوصی با این کد وجود ندارد'))		
 					if (ctx.args.options.accessToken.userId.toString() !== championInst.creatorId.toString())
 						return next(new Error('خطا! شما برای اعمال تغییرات دسترسی ندارید'))
 					var whiteList = ['name', 'capacity']
@@ -121,10 +127,14 @@ module.exports = function(champion) {
 			champion.findById(ctx.req.params.id.toString(), function(err, championInst) {
 				if (err)
 					return next(err)
+				if (!championInst)
+					return callback(new Error('خطا! لیگ خصوصی با این کد وجود ندارد'))	
 				var client = app.models.client
 				client.findById(championInst.creatorId.toString(), function(err, clientInst) {
 					if (err)
 						return callback(err)
+					if (!clientInst)
+						return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))		
 					if (response.roles.length == 0) {
 						if (ctx.args.options.accessToken.userId.toString() !== championInst.creatorId.toString())
 							return next(new Error('خطا! شما برای حذف این لیگ خصوصی دسترسی ندارید'))							
@@ -141,6 +151,8 @@ module.exports = function(champion) {
 		champion.findById(championId.toString(), function(err, championInst) {
 			if (err)
 				return callback(err)
+			if (!championInst)
+				return callback(new Error('خطا! لیگ خصوصی با این کد وجود ندارد'))
 			championInst.clients(function(err, champClientsList) {
 				if (err)
 					return callback(err)
@@ -153,6 +165,8 @@ module.exports = function(champion) {
 				client.findById(clientId.toString(), function(err, clientInst) {
 					if (err)
 						return callback(err)
+					if (!clientInst)
+						return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))		
 					championInst.clients.add(clientInst, function(err, result) {
 						if (err)
 							return callback(err)
@@ -205,6 +219,8 @@ module.exports = function(champion) {
 		champion.findById(championId.toString(), function(err, championInst) {
 			if (err)
 				return callback(err)
+			if (!championInst)
+				return callback(new Error('خطا! لیگ خصوصی با این کد وجود ندارد'))
 			if (ctx.req.accessToken.userId.toString() !== championInst.creatorId.toString())
 				return callback(new Error('خطا! شما برای اخراج کاربر از این لیگ خصوصی دسترسی ندارید'))
 			if (ctx.req.accessToken.userId.toString() === clientId.toString())
@@ -264,6 +280,8 @@ module.exports = function(champion) {
 		champion.findById(championId.toString(), function(err, championInst) {
 			if (err)
 				return callback(err)
+			if (!championInst)
+				return callback(new Error('خطا! لیگ خصوصی با این کد وجود ندارد'))
 			if (ctx.req.accessToken.userId.toString() === championInst.creatorId.toString())
 				return callback(new Error('خطا! سازنده لیگ خصوصی نمی‌تواند از آن خارج شود'))
 			var client = app.models.client
