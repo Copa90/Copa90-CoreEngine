@@ -76,6 +76,20 @@ module.exports = function(verification) {
 		})
 	}
 
+	function sendFailureSMS(phoneNumber, randNumb, callback) {
+		var data = {
+			'receptor': phoneNumber,
+			'token': randNumb,
+			'template': 'VerificationNo2'
+		}
+		var url = begURL + '?' + utility.generateQueryString(data)
+		getRequest(url, function(err, result) {
+			if (err)
+				return callback(err, null)
+			return callback(null, result)
+		})
+	}
+
 	function sendPasswordSMS(phoneNumber, message, callback) {
 		var base = 'https://api.kavenegar.com/v1/@/sms/send.json'
 		var beg = base.replace('@', token)
@@ -270,5 +284,37 @@ module.exports = function(verification) {
 			return callback(null, result)			
 		})
 	}
+	
+  verification.resendPendingVerification = function (callback) {
+		verification.find({where:{"status": statusConfig.pending}}, function(err, verifyList) {
+			if (err)
+				return callback(err, null)
+			var counter = 0
+			for (var i = 0; i < verifyList.length; i++) {
+				var model = verifyList[i]
+				sendFailureSMS(model.phoneNumber, model.verificationNumber, function(err, result) {
+					if (err)
+						return callback(err, null)
+					counter++
+					if (counter == verifyList.length)
+						return callback(null, counter.toString() + ' models send')
+				})
+			}
+		})
+	}
 
+  verification.remoteMethod('resendPendingVerification', {
+    accepts: [],
+    description: 'resending verification number to all pending user phone number',
+    http: {
+      path: '/resendPendingVerification',
+      verb: 'POST',
+      status: 200,
+      errorStatus: 400
+    },
+    returns: {
+      type: 'object',
+      root: true
+    }
+	})	
 }
