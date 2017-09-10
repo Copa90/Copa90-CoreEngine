@@ -23,7 +23,7 @@ module.exports = function(estimate) {
 			clientInst.estimates({where:{predictId: ctx.args.data.predictId.toString()}}, function(err, estimatesList) {
 				if (err)
 					return next(err)
-				if (estimates.length != 0)
+				if (estimatesList.length != 0)
 					return next(new Error('خطا! شما در حال حاضر این پیش‌بینی را تائید کرده‌اید'))
 				predict.findById(ctx.args.data.predictId.toString(), function(err, predictInst) {
 					if (err)
