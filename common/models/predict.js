@@ -115,7 +115,9 @@ module.exports = function(predict) {
 						})
 					}
 					else {
-						return cb(null)
+						counter3++
+						if (counter3 == estimateList.length)
+							return cb(null)
 					}
 				})
 			}					
@@ -184,6 +186,8 @@ module.exports = function(predict) {
 				league.findById(model.leagueId.toString(), function(err, leagueInst) {
 					if (err)
 						return next(err)
+					if (!leagueInst)
+						return next(new Error('خطا! لیگ معتبری با این مشخصات وجود ندارد'))		
 					model.leagueRel(leagueInst)
 					counter++
 					if (counter == modelInstance.length)
@@ -195,6 +199,8 @@ module.exports = function(predict) {
 			league.findById(modelInstance.leagueId.toString(), function(err, leagueInst) {
 				if (err)
 					return next(err)
+				if (!leagueInst)
+					return next(new Error('خطا! لیگ معتبری با این مشخصات وجود ندارد'))	
 				modelInstance.leagueRel(leagueInst)
 				return next()
 			})	

@@ -49,7 +49,7 @@ module.exports = function(champion) {
 			if (err)
 				return next(err)
 			if (!clientInst)
-				return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
+				return next(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
 			if (ctx.args.data.capacity < 2)
 				return next(new Error('خطا! ظرفیت لیگ خصوصی نباید کمتر از ۲ نفر باشد'))
 			ctx.args.data.beginningTime = time
@@ -64,7 +64,7 @@ module.exports = function(champion) {
 			if (err)
 				return next(err)
 			if (!clientInst)
-				return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
+				return next(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
 			modelInstance.clients.add(clientInst, function(err, result) {
 				if (err)
 					return next(err)
@@ -128,13 +128,13 @@ module.exports = function(champion) {
 				if (err)
 					return next(err)
 				if (!championInst)
-					return callback(new Error('خطا! لیگ خصوصی با این کد وجود ندارد'))	
+					return next(new Error('خطا! لیگ خصوصی با این کد وجود ندارد'))	
 				var client = app.models.client
 				client.findById(championInst.creatorId.toString(), function(err, clientInst) {
 					if (err)
-						return callback(err)
+						return next(err)
 					if (!clientInst)
-						return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))		
+						return next(new Error('خطا! کاربری با این مشخصات وجود ندارد'))		
 					if (response.roles.length == 0) {
 						if (ctx.args.options.accessToken.userId.toString() !== championInst.creatorId.toString())
 							return next(new Error('خطا! شما برای حذف این لیگ خصوصی دسترسی ندارید'))							
@@ -229,6 +229,8 @@ module.exports = function(champion) {
 			client.findById(clientId.toString(), function(err, clientInst) {
 				if (err)
 					return callback(err)
+				if (!clientInst)
+					return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
 				championInst.clients.remove(clientInst, function(err, result) {
 					if (err)
 						return callback(err)
@@ -288,6 +290,8 @@ module.exports = function(champion) {
 			client.findById(clientId.toString(), function(err, clientInst) {
 				if (err)
 					return callback(err)
+				if (!clientInst)
+					return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
 				championInst.clients.remove(clientInst, function(err, result) {
 					if (err)
 						return callback(err)

@@ -63,7 +63,7 @@ module.exports = function(client) {
       ctx.req.body.email 					= ctx.req.body.email.toLowerCase()
     }
     if (ctx.args.credentials.phoneNumber) {
-      client.find({where:{phoneNumber: ctx.args.credentials.phoneNumber}}, function(err, results) {
+      client.find({where:{phoneNumber: ctx.args.credentials.phoneNumber.toString()}}, function(err, results) {
         if (err)
           return next(err)
         if (results.length == 0)
@@ -83,6 +83,8 @@ module.exports = function(client) {
     client.findById(modelInstance.userId, function(err, clientInst) {
       if (err)
         return next(err)
+      if (!clientInst)
+        return next(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
       if (clientInst.phoneNumber === '09120001122')
         return next()
       if (clientInst.accountInfoModel.lastLogin == 0 || !clientInst.accountInfoModel.lastLogin) {
@@ -167,6 +169,8 @@ module.exports = function(client) {
           client.findById(ctx.args.data.referrer.toString(), function(err, result) {
             if (err)
               return next(new Error('خطا! معرفی با این کد وجود ندارد'))
+            if (!result)
+              return next(new Error('خطا! معرفی با این کد وجود ندارد'))
             done()
           })
         } else {
@@ -176,7 +180,7 @@ module.exports = function(client) {
     })
   })
 
-  /*
+  
   client.afterRemote('create', function (ctx, modelInstance, next) {
     var option = {}
     option.name = '' + modelInstance.id.toString()
@@ -191,8 +195,8 @@ module.exports = function(client) {
           client.findById(modelInstance.referrer.toString(), function(err, referrerInst) {
             if (err)
               return next(err)
-            if (referrerInst)
-              return next()
+            if (!referrerInst)
+              return next(new Error('خطا! معرفی با این کد وجود ندارد'))
             if (referrerInst.referralModel.clients.length >= 10) {
               return next()
             }
@@ -223,7 +227,7 @@ module.exports = function(client) {
       })
     })
   })
-  */
+  
 
   client.beforeRemote('prototype.__update__accountInfo', function (ctx, modelInstance, next) {
     if (!ctx.args.options.accessToken)
@@ -231,6 +235,8 @@ module.exports = function(client) {
     client.findById(ctx.req.params.id.toString(), function (err, result) {
       if (err)
         return next(err)
+      if (!result)
+        return next(new Error('خطا! کاربری با این مشخصات وجود ندارد')) 
 			if (ctx.args.data.chances)
 				ctx.args.data.chances 		+= Number(result.accountInfoModel.chances)
 			if (ctx.args.data.roundWins)
@@ -347,6 +353,8 @@ module.exports = function(client) {
       return callback(new Error('خطا! شما امکان دیدن پیش‌بینی‌ها را ندارید'))
 
     client.findById(clientId.toString(), function(err, clientInst) {
+      if (!clientInst)
+        return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
       clientInst.estimates({'where':{'status':'Open'}}, function(err, estimatesList) {
         if (err)
           return callback(err)
@@ -386,6 +394,8 @@ module.exports = function(client) {
           league.findById(leagueId.toString(), function(err, leagueInst) {
             if (err)
               return callback(err)
+            if (!leagueInst)
+              return callback(new Error('خطا! لیگ معتبری با این مشخصات وجود ندارد'))      
             leagueInst.predicts({'where':{'status':'Working'}}, function(err, predictsList) {
               if (err)
                 return callback(err)

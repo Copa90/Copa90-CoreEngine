@@ -155,7 +155,9 @@ module.exports = function(exact) {
 						})
 					}
 					else {
-						return cb(null)
+						counter3++
+						if (counter3 == choiceList.length)
+							return cb(null)
 					}
 				})
 			}					
@@ -259,6 +261,8 @@ module.exports = function(exact) {
 		league.findById(modelInstance.leagueId.toString(), function(err, leagueInst) {
 			if (err)
 				return next(err)
+      if (!leagueInst)
+        return next(new Error('خطا! لیگ معتبری با این مشخصات وجود ندارد'))
 			modelInstance.leagueRel(leagueInst)
 			return next()
 		})	

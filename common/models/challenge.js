@@ -26,7 +26,7 @@ module.exports = function(challenge) {
 						competition.find({'where':{'challengeId': challengeInst.id.toString()}}, function(err, competitionsList) {
 							if (err)
 								console.error(err)
-							if (competitionsList.length == 1)
+							if (competitionsList.length == 0)
 								return console.error('challenge does not exist')
 							function compare(a, b){
 								return Number(b.points) - Number(a.points)
@@ -38,10 +38,12 @@ module.exports = function(challenge) {
 							client.findById(competitionsList[0].clientId.toString(), function(err, clientInst) {
 								if (err)
 									console.error(err)
+								if (!clientInst)
+									return console.error('client does not exists for challenge award')
 								var award = (Number(challengeInst.reduceChances) * 2) + Number(clientInst.accountInfoModel.chances)
 								clientInst.accountInfo.update({'chances': award}, function(err, result) {
 									if (err)
-										console.error(err)
+										return console.error(err)
 									console.log('successful rewarding')
 								})
 							})
@@ -60,6 +62,8 @@ module.exports = function(challenge) {
 		client.findById(ctx.args.data.creatorId.toString(), function(err, clientInst) {
 			if (err)
 				return next(err)
+			if (!clientInst)
+				return next(new Error('خطا! کاربری با این شماره کاربری وجود ندارد'))
 			if (Number(clientInst.accountInfoModel.chances) < Number(ctx.args.data.reduceChances))
 				return next(new Error('خطا! شما به اندازه کافی شانس برای ایجاد چالش ندارید'))
 			if (Number(ctx.args.data.period) < 259200000)
@@ -77,6 +81,8 @@ module.exports = function(challenge) {
 		client.findById(modelInstance.creatorId.toString(), function(err, clientInst) {
 			if (err)
 				return next(err)
+			if (!clientInst)
+				return next(new Error('خطا! کاربری با این شماره کاربری وجود ندارد'))
 			modelInstance.clients.add(clientInst, function(err, result) {
 				if (err)
 					return next(err)
@@ -100,6 +106,8 @@ module.exports = function(challenge) {
 				challenge.findById(ctx.req.params.id.toString(), function(err, challengeInst) {
 					if (err)
 						return next(err)
+					if (!challengeInst)
+						return next(new Error('خطا! چالشی با این مشخصات وجود ندارد'))		
 					if (ctx.args.options.accessToken.userId.toString() !== challengeInst.creatorId.toString())
 						return next(new Error('خطا! شما برای اعمال تغییرات دسترسی ندارید'))
 					var whiteList = ['name']
@@ -148,10 +156,14 @@ module.exports = function(challenge) {
 			challenge.findById(ctx.req.params.id.toString(), function(err, challengeInst) {
 				if (err)
 					return next(err)
+				if (!challengeInst)
+					return next(new Error('خطا! چالشی با این مشخصات وجود ندارد'))	
 				var client = app.models.client
 				client.findById(challengeInst.creatorId.toString(), function(err, clientInst) {
 					if (err)
-						return callback(err)
+						return next(err)
+					if (!clientInst)
+						return next(new Error('خطا! کاربر سازنده‌ای با این مشخصات وجود ندارد'))		
 					if (response.roles.length == 0) {
 						if (ctx.args.options.accessToken.userId.toString() !== challengeInst.creatorId.toString())
 							return next(new Error('خطا! شما برای حذف این چالش دسترسی ندارید'))							
@@ -168,6 +180,8 @@ module.exports = function(challenge) {
 		challenge.findById(challengeId.toString(), function(err, challengeInst) {
 			if (err)
 				return callback(err)
+			if (!challengeInst)
+				return callback(new Error('خطا! چالشی با این مشخصات وجود ندارد'))	
 			challengeInst.clients(function(err, challengeClientsList) {
 				if (err)
 					return callback(err)
@@ -180,6 +194,8 @@ module.exports = function(challenge) {
 				client.findById(clientId.toString(), function(err, clientInst) {
 					if (err)
 						return callback(err)
+					if (!clientInst)
+						return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))		
 					if (Number(clientInst.accountInfoModel.chances) < Number(challengeInst.reduceChances))
 						return callback(new Error('خطا! شما به اندازه کافی شانس برای پیوستن به این چالش ندارید'))
 					challengeInst.clients.add(clientInst, function(err, result) {
@@ -239,12 +255,16 @@ module.exports = function(challenge) {
 		challenge.findById(challengeId.toString(), function(err, challengeInst) {
 			if (err)
 				return callback(err)
+			if (!challengeInst)
+				return callback(new Error('خطا! چالشی با این مشخصات وجود ندارد'))	
 			if (ctx.req.accessToken.userId.toString() === challengeInst.creatorId.toString())
 				return callback(new Error('خطا! سازنده چالش نمی‌تواند از آن خارج شود'))
 			var client = app.models.client
 			client.findById(clientId.toString(), function(err, clientInst) {
 				if (err)
 					return callback(err)
+				if (!clientInst)
+					return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))		
 				challengeInst.clients.remove(clientInst, function(err, result) {
 					if (err)
 						return callback(err)

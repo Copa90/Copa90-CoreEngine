@@ -17,9 +17,13 @@ module.exports = function(transaction) {
 		client.findById(ctx.args.data.clientId.toString(), function(err, clientInst) {
 			if (err)
 				return next(err)
+      if (!clientInst)
+        return next(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
 			package.findById(ctx.args.data.packageId.toString(), function(err, packageInst) {
 				if (err)
 					return next(err)
+				if (!packageInst)
+					return next(new Error('خطا! پکیجی با این مشخصات وجود ندارد'))	
 				modelInstance.clientRel(clientInst)
 				modelInstance.packageRel(packageInst)
 				if (modelInstance.status === statusConfig.successful) {
@@ -34,6 +38,8 @@ module.exports = function(transaction) {
 								client.findById(clientInst.referrer.toString(), function(err, referrerInst) {
 									if (err)
 										return next(err)
+									if (!referrerInst)
+										return next()
 									var newReferrerChances = Number(referrerInst.accountInfoModel.chances) + 5
 									referrerInst.accountInfo.update({'chances': newReferrerChances}, function(err, result) {
 										if (err)

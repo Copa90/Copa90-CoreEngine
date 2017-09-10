@@ -10,11 +10,15 @@ module.exports = function (team) {
 		var client = app.models.client
     client.findById(clientId.toString(), function (err, clientInst) {
       if (err)
-				return cb(err)
+        return cb(err)
+      if (!clientInst)
+        return cb(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
       team.findById(teamId.toString(), function (err, teamInst) {
         if (err)
 					return cb(err)
-				clientInst.updateAttribute('teamId', teamId.toString(), function (err, result) {
+        if (!teamInst)
+          return cb(new Error('خطا! تیم معتبری با این مشخصات وجود ندارد'))  
+        clientInst.updateAttribute('teamId', teamId.toString(), function (err, result) {
 					if (err)
 						return cb(err)
 					return cb(null, result)

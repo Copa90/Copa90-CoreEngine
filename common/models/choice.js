@@ -23,6 +23,8 @@ module.exports = function(choice) {
 		client.findById(ctx.args.data.clientId.toString(), function(err, clientInst) {
 			if (err)
 				return next(err)
+			if (!clientInst)
+				return next(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
 			if (Number(clientInst.accountInfoModel.chances) <= 0)
 				return next(new Error('خطا! فرصت‌های شما برای پیش‌بینی تمام شده‌است'))
 			if (Number(clientInst.accountInfoModel.chances) < totalCount)
@@ -30,11 +32,13 @@ module.exports = function(choice) {
 			exact.findById(ctx.args.data.exactId.toString(), function(err, exactInst) {
 				if (err)
 					return next(err)
+				if (!exactInst)
+					return next(new Error('خطا! پیش‌بینی قطعی‌ای با این مشخصات وجود ندارد'))
 				var time = utility.getUnixTimeStamp()
 				if (!(exactInst.status === exactStatusConfig.working))
-					return next(new Error('خطا! این پیش‌بینی دقیق دیگر باز نیست'))
+					return next(new Error('خطا! این پیش‌بینی قطعی دیگر باز نیست'))
 				if (!(time >= Number(exactInst.beginningTime) && time <= Number(exactInst.endingTime)))
-					return next(new Error('خطا! دوره زمانی این پیش‌بینی دقیق تمام شده‌است'))
+					return next(new Error('خطا! دوره زمانی این پیش‌بینی قطعی تمام شده‌است'))
 				exactInst.leagueRel(function(err, leagueInst) {
 					if (err)
 						return next(err)
@@ -87,7 +91,7 @@ module.exports = function(choice) {
 							return next()		
 						}
 						else 
-							return next(new Error('خطا! شما در حال حالضر یک مدل انتخاب برای این پیش‌بینی دقیق دارید'))
+							return next(new Error('خطا! شما در حال حالضر یک مدل انتخاب برای این پیش‌بینی قطعی دارید'))
 					})	
 				})
 			})
@@ -103,17 +107,21 @@ module.exports = function(choice) {
 			client.findById(choiceInst.clientId.toString(), function(err, clientInst) {
 				if (err)
 					return next(err)
+				if (!clientInst)
+					return next(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
 				exact.findById(choiceInst.exactId.toString(), function(err, exactInst) {
 					if (err)
 						return next(err)
+					if (!exactInst)
+						return next(new Error('خطا! پیش‌بینی قطعی‌ای با این مشخصات وجود ندارد'))		
 					var time = utility.getUnixTimeStamp()
 					if (!(exactInst.status === exactStatusConfig.working))
-						return next(new Error('خطا! این پیش‌بینی دقیق دیگر باز نیست'))
+						return next(new Error('خطا! این پیش‌بینی قطعی دیگر باز نیست'))
 					if (!(time >= Number(exactInst.beginningTime) && time <= Number(exactInst.endingTime)))
-						return next(new Error('خطا! دوره زمانی این پیش‌بینی دقیق تمام شده‌است'))
+						return next(new Error('خطا! دوره زمانی این پیش‌بینی قطعی تمام شده‌است'))
 	
 					if (choiceInst.firstOption.choice && choiceInst.secondOption.choice && choiceInst.thirdOption.choice)
-						return next(new Error('خطا! شما انتخاب دیگری نمیتوانید برای این پیش‌بینی دقیق انجام دهید'))
+						return next(new Error('خطا! شما انتخاب دیگری نمیتوانید برای این پیش‌بینی قطعی انجام دهید'))
 
 					if (ctx.args.data.firstOption.choice) {
 						if (ctx.args.data.secondOption.choice) {
@@ -206,9 +214,13 @@ module.exports = function(choice) {
 		client.findById(modelInstance.clientId.toString(), function(err, clientInst) {
 			if (err)
 				return next(err)
+			if (!clientInst)
+				return next(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
 			exact.findById(modelInstance.exactId.toString(), function(err, exactInst) {
 				if (err)
 					return next(err)
+				if (!exactInst)
+					return next(new Error('خطا! پیش‌بینی قطعی‌ای با این مشخصات وجود ندارد'))
 				var totalCount = 0
 				if (modelInstance.firstOption.choice)
 					totalCount++
@@ -235,9 +247,13 @@ module.exports = function(choice) {
 		client.findById(modelInstance.clientId.toString(), function(err, clientInst) {
 			if (err)
 				return next(err)
+			if (!clientInst)
+				return next(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
 			exact.findById(modelInstance.exactId.toString(), function(err, exactInst) {
 				if (err)
 					return next(err)
+				if (!exactInst)
+					return next(new Error('خطا! پیش‌بینی قطعی‌ای با این مشخصات وجود ندارد'))
 				var totalCount = 0
 				if (modelInstance.firstOption.choice && modelInstance.firstOption.byEdit)
 					totalCount++
