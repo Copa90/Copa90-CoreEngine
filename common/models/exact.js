@@ -107,7 +107,7 @@ module.exports = function(exact) {
 													counter1++
 													if (err)
 														return cb1(err)
-													if (counter1++ == rankingList.length)
+													if (counter1 == rankingList.length)
 														return cb1(null, 'successful')
 												})
 											}
