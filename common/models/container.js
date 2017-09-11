@@ -3,6 +3,7 @@ var utility = require('../../public/utility.js')
 var CONTAINERS_URL = 'containers/'
 
 var fs = require('fs')
+var fse = require('fs-extra')
 var path = require('path')
 
 var app = require('../../server/server')
@@ -71,25 +72,31 @@ module.exports = function(container) {
     client.find({where:{phoneNumber:{neq: '09120001122'}}}, function(err, clientList) {
       if (err)
         return cb(err)
+      function changeData(data, cb) {
+        var directory = path.resolve(__dirname + '/../../fileStorage/')
+        var dir = directory + '/' + data.id.toString() 
+        var fp = directory + '/' + data.id.toString() + '/profile.png'
+        console.log(dir)
+        fse.ensureDir(dir, err => {
+          if (!err) {
+            container.uploadSampleProImage(data.id.toString(), function(err, result) {
+              if (err)
+                return cb(err)
+              return cb(null, 'successfully regenerated')
+            })
+          }
+        })
+      }
       var counter = 0
       for (var i = 0; i < clientList.length; i++) {
         var model = clientList[i]
-        var directory = path.resolve(__dirname + '/../../fileStorage/')
-        var fp = directory + '/' + model.id.toString() + '/profile.png'
-        var option = {}
-        option.name = '' + model.id.toString()
-        container.createContainer(option, function (err, res) {
+        changeData(model, function(err, result) {
           if (err)
             return cb(err)
-          console.log(JSON.stringify(res))
-          container.uploadSampleProImage(res.name.toString(), function(err, result) {
-            if (err)
-              return cb(err)
-            counter++
-            if (counter == clientList.length)
-              return cb(null, 'successfully regenerated')
-          })
-        })          
+          counter++
+          if (counter == clientList.length)
+            return cb(null, counter + ' profiles successfully regenerated')
+        })
       }
     })
 	}
