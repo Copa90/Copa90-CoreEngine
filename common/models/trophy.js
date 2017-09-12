@@ -45,7 +45,7 @@ module.exports = function (trophy) {
       var counter = 0
       for (var i = 0; i < clientList.length; i++) {
         var model = clientList[i]
-        trophyCheck(model, function(err, result) {
+        trophy.trophyCheck(model, function(err, result) {
           if (err)
             return cb(err)
           counter++
