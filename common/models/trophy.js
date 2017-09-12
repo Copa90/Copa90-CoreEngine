@@ -20,8 +20,8 @@ module.exports = function (trophy) {
     var badgeArray = [0, 500, 3000, 8000, 15000, 30000, 50000, 100000, 200000, 500000, 1000000]
     var totalPoints = Number(clientInst.accountInfoModel.totalPoints)
     var level = 0
-    for (var i = 0; i < (badgeArray.length - 1); i++) {
-      if (totalPoints >= badgeArray[i] && totalPoints <= badgeArray[i + 1])
+    for (var i = 0; i < (badgeArray.length); i++) {
+      if (totalPoints >= badgeArray[i])
         level++
       else
         break
