@@ -1,3 +1,4 @@
+var app = require('../../server/server')
 var utility	= require('../../public/utility')
 
 var request = require('request')
@@ -16,26 +17,60 @@ function getRequest(url, callback) {
 module.exports = function (trophy) {
 
   trophy.trophyCheck = function (clientInst, cb) {
-    var badgeArray = [0, 150, 300, 500, 1000, 2000, 4000, 8000, 15000, 25000, 50000]
+    var badgeArray = [0, 500, 3000, 8000, 15000, 30000, 50000, 100000, 200000, 500000, 1000000]
     var totalPoints = Number(clientInst.accountInfoModel.totalPoints)
-    if (Number(clientInst.trophyModel.level) + 1 < badgeArray.length) {
-      if (totalPoints > badgeArray[Number(clientInst.trophyModel.level) + 1]) {
-        var data = {
-          'time': utility.getUnixTimeStamp(),
-          'level': Number(clientInst.trophyModel.level) + 1
-        }
-        clientInst.trophy.update(data, function(err, result) {
-          if (err)
-            return cb(err)
-          return cb(null, 'successful')
-        })
-      }
-      else {
-        return cb(null, 'no need')
-      }
+    var level = 0
+    for (var i = 0; i < (badgeArray.length - 1); i++) {
+      if (totalPoints >= badgeArray[i] && totalPoints <= badgeArray[i + 1])
+        level++
+      else
+        break
     }
+    var data = {
+      'time': utility.getUnixTimeStamp(),
+      'level': level
+    }
+    clientInst.trophy.update(data, function(err, result) {
+      if (err)
+        return cb(err)
+      return cb(null, 'successful')
+    })
   }
 
+  trophy.recheckTrophy = function (cb) {
+    var client = app.models.client
+    client.find({where:{phoneNumber:{neq: '09120001122'}}}, function(err, clientList) {
+      if (err)
+        return cb(err)
+      var counter = 0
+      for (var i = 0; i < clientList.length; i++) {
+        var model = clientList[i]
+        trophyCheck(model, function(err, result) {
+          if (err)
+            return cb(err)
+          counter++
+          if (counter == clientList.length)
+            return cb(null, counter + ' clients rechecked for trophy')
+        })
+      }
+    })
+  }
+
+  trophy.remoteMethod('recheckTrophy', {
+    accepts: [],
+    description: 'recheck trophy points for all of clients',
+    http: {
+      path: '/recheckTrophy',
+      verb: 'POST',
+      status: 200,
+      errorStatus: 400
+    },
+    returns: {
+      type: 'object',
+      root: true
+    }
+  })
+  
 	var baseURL = 'http://res.cloudinary.com/dqyiaeoz1/image/upload'
 
 	var farFarColor = 'e_colorize,co_rgb:010101'
