@@ -23,7 +23,8 @@ module.exports = function(package) {
 		package.find({
 			where: {
 				'status': statusConfig.created
-			}
+			},
+			limit: 50000
 		}, function (err, packageList) {
 			if (err)
 				console.error(err)
@@ -44,7 +45,8 @@ module.exports = function(package) {
 		package.find({
 			where: {
 				'status': statusConfig.working
-			}
+			},
+			limit: 50000
 		}, function (err, packageList) {
 			if (err)
 				console.error(err)

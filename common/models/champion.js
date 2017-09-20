@@ -8,13 +8,13 @@ module.exports = function(champion) {
 
 	var hitRateCalculator = cron.job("0 */5 * * * *", function () {
 		var time = utility.getUnixTimeStamp()
-		champion.find(function(err, championsList) {
+		champion.find({limit: 50000}, function(err, championsList) {
 			if (err)
 				return console.error(err)
 			for (var i = 0; i < championsList.length; i++) {
 				var championInst = championsList[i]
 				var ranking = app.models.ranking
-				ranking.find({where:{'leagueId': championInst.id.toString()}}, function(err, rankingList) {
+				ranking.find({where:{'leagueId': championInst.id.toString()}, limit: 50000}, function(err, rankingList) {
 					if (err)
 						return console.error(err)
 					if (rankingList.length == 1)

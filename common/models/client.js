@@ -25,7 +25,7 @@ var persianize = require('persianize')
 module.exports = function(client) {
 
 	var dailyPredict = cron.job("00 00 00 * * 1-7", function () {
-    client.find(function(err, clientList) {
+    client.find({limit: 50000}, function(err, clientList) {
       if (err)
         return console.error(err)
       for (var i = 0; i < clientList.length; i++) {
@@ -63,7 +63,7 @@ module.exports = function(client) {
       ctx.req.body.email 					= ctx.req.body.email.toLowerCase()
     }
     if (ctx.args.credentials.phoneNumber) {
-      client.find({where:{phoneNumber: ctx.args.credentials.phoneNumber.toString()}}, function(err, results) {
+      client.find({where:{phoneNumber: ctx.args.credentials.phoneNumber.toString()}, limit: 50000}, function(err, results) {
         if (err)
           return next(err)
         if (results.length == 0)
@@ -371,7 +371,7 @@ module.exports = function(client) {
         }
         var league = app.models.league
         if (leagueId === 'every') {
-          league.find(function(err, leagueList) {
+          league.find({limit: 50000}, function(err, leagueList) {
             if (err)
               return callback(err)
             var counter = 0
@@ -444,7 +444,7 @@ module.exports = function(client) {
   })
   
   client.sendPassword = function (phoneNumber, callback) {
-    client.find({'where':{'phoneNumber': phoneNumber}}, function(err, clients) {
+    client.find({'where':{'phoneNumber': phoneNumber}, limit: 50000}, function(err, clients) {
       if (err)
         return callback(err)
       if (clients.length == 0) {
@@ -488,7 +488,8 @@ module.exports = function(client) {
 
   client.statistics = function (callback) {
 		var filter = {
-			skip: '6',
+      skip: '6',
+      limit: 50000,
 			fields: {
 				'email': false,
 				'time': false,

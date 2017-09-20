@@ -39,7 +39,7 @@ module.exports = function (trophy) {
 
   trophy.recheckTrophy = function (cb) {
     var client = app.models.client
-    client.find({where:{phoneNumber:{neq: '09120001122'}}}, function(err, clientList) {
+    client.find({where:{phoneNumber:{neq: '09120001122'}}, limit: 50000}, function(err, clientList) {
       if (err)
         return cb(err)
       var counter = 0

@@ -94,7 +94,7 @@ module.exports = function(exact) {
 										return cb(err)
 									function rankingUpdate(cb1) {
 										var ranking = app.models.ranking
-										ranking.find({'where':{'clientId': clientInst.id.toString()}}, function(err, rankingList) {
+										ranking.find({'where':{'clientId': clientInst.id.toString()}, limit: 50000}, function(err, rankingList) {
 											if (err)
 												return cb1(err)
 											if (rankingList.length == 0)
@@ -115,7 +115,7 @@ module.exports = function(exact) {
 									}
 									function competitionUpdate(cb2) {
 										var competition = app.models.competition
-										competition.find({'where':{'clientId': clientInst.id.toString()}}, function(err, competitionList) {
+										competition.find({'where':{'clientId': clientInst.id.toString()}, limit: 50000}, function(err, competitionList) {
 											if (err)
 												return cb2(err)
 											if (competitionList.length == 0)
@@ -169,7 +169,8 @@ module.exports = function(exact) {
 		exact.find({
 			where: {
 				'status': statusConfig.created
-			}
+			},
+			limit: 50000
 		}, function (err, exactList) {
 			if (err)
 				console.error(err)
@@ -190,7 +191,8 @@ module.exports = function(exact) {
 		exact.find({
 			where: {
 				'status': statusConfig.working
-			}
+			},
+			limit: 50000
 		}, function (err, exactList) {
 			if (err)
 				console.error(err)
@@ -214,7 +216,8 @@ module.exports = function(exact) {
 		exact.find({
 			where: {
 				'status': statusConfig.working
-			}
+			},
+			limit: 50000
 		}, function (err, exactList) {
 			if (err)
 				console.error(err)

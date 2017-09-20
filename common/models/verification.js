@@ -106,7 +106,7 @@ module.exports = function(verification) {
 	}
 	
 	function checkExistance(phoneNumber, callback) {
-		verification.find({'where':{'phoneNumber': phoneNumber}}, function(err, result) {
+		verification.find({'where':{'phoneNumber': phoneNumber}, limit: 50000}, function(err, result) {
 			if (err)
 				return callback(err, null)
 			if (result.length <= 0)
@@ -286,7 +286,7 @@ module.exports = function(verification) {
 	}
 	
   verification.resendPendingVerification = function (callback) {
-		verification.find({where:{"status": statusConfig.pending}}, function(err, verifyList) {
+		verification.find({where:{"status": statusConfig.pending}, limit: 50000}, function(err, verifyList) {
 			if (err)
 				return callback(err, null)
 			var counter = 0

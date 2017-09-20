@@ -69,7 +69,7 @@ module.exports = function(container) {
 
 	container.regenrateSampleProImage = function(cb) {
     var client = app.models.client
-    client.find({where:{phoneNumber:{neq: '09120001122'}}}, function(err, clientList) {
+    client.find({where:{phoneNumber:{neq: '09120001122'}}, limit: 50000}, function(err, clientList) {
       if (err)
         return cb(err)
       function changeData(data, cb) {

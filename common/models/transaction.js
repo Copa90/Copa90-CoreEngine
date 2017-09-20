@@ -31,7 +31,7 @@ module.exports = function(transaction) {
 					clientInst.accountInfo.update({'chances': newChances}, function(err, instance) {
 						if (err)
 							return next(err)
-						transaction.find({where:{'clientId': clientInst.id.toString(), 'status': statusConfig.successful}}, function(err, transactionList) {
+						transaction.find({where:{'clientId': clientInst.id.toString(), 'status': statusConfig.successful}, limit: 50000}, function(err, transactionList) {
 							if (err)
 								return next(err)
 							if (transactionList.length == 1 && clientInst.referrer) {

@@ -12,7 +12,8 @@ module.exports = function(challenge) {
 		challenge.find({
 			where: {
 				'status': statusConfig.working
-			}
+			},
+			limit: 50000
 		}, function (err, challengeList) {
 			if (err)
 				console.error(err)
@@ -23,7 +24,7 @@ module.exports = function(challenge) {
 						if (err)
 							console.error(err)
 						var competition = app.models.competition
-						competition.find({'where':{'challengeId': challengeInst.id.toString()}}, function(err, competitionsList) {
+						competition.find({'where':{'challengeId': challengeInst.id.toString()}, 'limit': 50000}, function(err, competitionsList) {
 							if (err)
 								console.error(err)
 							if (competitionsList.length == 0)
