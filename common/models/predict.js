@@ -125,8 +125,9 @@ module.exports = function(predict) {
 							// reductionProcess(predictInstance, function(err, result) {
 							// 	if (err)
 							// 		return cb(err)
-								return cb(null, result)
+								// return cb(null, result)
 							// })
+							return cb(null, 'successful')
 						}
 					}
 				})
