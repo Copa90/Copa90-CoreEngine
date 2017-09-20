@@ -116,20 +116,24 @@ module.exports = function(verification) {
 		})
 	}
 
-	function sendVerificationAlgorithm(phoneNumber, verif, callback) {
+	function sendVerificationAlgorithm(phoneNumber, isNew, verif, callback) {
 		checkExistance(phoneNumber, function(err, result) {
 			if (err)
 				return callback(err, null)
 			if (!result) {
-				createVerification(phoneNumber, verif, function(err, result) {
-					if (err)
-						return callback(err, null)
-					sendSMS(phoneNumber, verif, function(err, result) {
+				if (isNew) {
+					createVerification(phoneNumber, verif, function(err, result) {
 						if (err)
 							return callback(err, null)
-						return callback(null, result)
-					})
-				})
+						sendSMS(phoneNumber, verif, function(err, result) {
+							if (err)
+								return callback(err, null)
+							return callback(null, result)
+						})
+					})	
+				}
+				else
+					return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
 			}
 			else if (result.status === statusConfig.verified)
 				return callback(null, 'already verified')
@@ -159,10 +163,10 @@ module.exports = function(verification) {
 		checkExistance(phoneNumber, function(err, result) {
 			if (err)
 				return callback(err, null)
-			if (!result) 
-				return callback(null, 'should start')
+			if (!result)
+				return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
 			else if (result.status === statusConfig.verified)
-				return callback(null, 'already verified')
+				return callback(new Error('خطا! این کاربر قبلا احراز هویت شده است'))
 			else {
 				if (result.verificationNumber === verif) {
 					result.updateAttribute('status', statusConfig.verified, function(err, result) {
@@ -171,13 +175,15 @@ module.exports = function(verification) {
 						return callback(null, result)
 					})					
 				}
+				else 
+					return callback(new Error('خطا! کد احراز هویت غلط است'))
 			}
 		})
 	}
 
   verification.sendVerification = function (phoneNumber, callback) {
 		var rand = getRandomInt(1250, 9999)
-		sendVerificationAlgorithm(phoneNumber, rand, function(err, response) {
+		sendVerificationAlgorithm(phoneNumber, true, rand, function(err, response) {
 			if (err)
 				return callback(err, null)
 			return callback(null, response)
@@ -195,6 +201,36 @@ module.exports = function(verification) {
     description: 'send verification sms to user',
     http: {
       path: '/:phoneNumber/sendVerification',
+      verb: 'POST',
+      status: 200,
+      errorStatus: 400
+    },
+    returns: {
+      type: 'object',
+      root: true
+    }
+  })
+
+  verification.resendVerification = function (phoneNumber, callback) {
+		var rand = getRandomInt(1250, 9999)
+		sendVerificationAlgorithm(phoneNumber, false, rand, function(err, response) {
+			if (err)
+				return callback(err, null)
+			return callback(null, response)
+		})
+  }
+
+  verification.remoteMethod('resendVerification', {
+    accepts: [{
+      arg: 'phoneNumber',
+      type: 'string',
+      http: {
+        source: 'path'
+      }
+    }],
+    description: 'send verification sms to user',
+    http: {
+      path: '/:phoneNumber/resendVerification',
       verb: 'POST',
       status: 200,
       errorStatus: 400
