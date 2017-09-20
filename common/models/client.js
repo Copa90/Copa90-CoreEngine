@@ -50,6 +50,9 @@ module.exports = function(client) {
   client.validatesUniquenessOf('email', {
     message: 'خطا! ایمیل وارد شده قبلا در سیستم ثبت شده است'
   })
+  client.validatesUniquenessOf('phoneNumber', {
+    message: 'خطا! شماره وارد شده قبلا در سیستم ثبت شده است'
+  })
 
   client.beforeRemote('login', function (ctx, modelInstance, next) {
     if (PRODUCTION) {
@@ -69,9 +72,20 @@ module.exports = function(client) {
         if (results.length == 0)
           return next(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
         var clientInst = results[0]
-        ctx.args.credentials.email 	= clientInst.email.toLowerCase()
-        ctx.req.body.email 					= clientInst.email.toLowerCase()
-        return next()
+        if (clientInst.status === 'Suspended')
+          return next(new Error('خطا! اکانت کاربری شما مسدود شده است'))
+        var verification = app.models.verification
+        verification.checkUserVerification(ctx.args.credentials.phoneNumber.toString(), function(err, result) {
+          if (err)
+            return next(err)
+          if (result == 0)
+            return next(new Error('خطا! کاربری با این مشخصات در لیست احراز هویت وجود ندارد'))
+          if (result == 1)
+            return next(new Error('خطا! شما هنوز احراز هویت نکرده‌اید'))
+          ctx.args.credentials.email 	= clientInst.email.toLowerCase()
+          ctx.req.body.email 					= clientInst.email.toLowerCase()
+          return next()  
+        })    
       })  
     }
     else {
@@ -521,6 +535,68 @@ module.exports = function(client) {
     http: {
       path: '/statistics',
       verb: 'GET',
+      status: 200,
+      errorStatus: 400
+    },
+    returns: {
+			type: 'object',
+			root: true
+    }
+  })
+
+  client.changePhone = function (data, callback) {
+    var phoneNumber = data.phoneNumber
+    var email = data.email
+    var password = data.password
+    client.find({where:{email: email.toString()}, limit: 50000}, function(err, results) {
+      if (err)
+        return callback(err)
+      if (results.length == 0)
+        return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
+      var clientInst = results[0]
+      if (!clientInst)
+        return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
+      var pass = utility.base64Decoding(clientInst.emps).toString()
+      if (phoneNumber === '09120001122')
+        return callback(new Error('خطا! شماره وارد شده قبلا در سیستم ثبت شده است'))
+      if (pass !== password)
+        return callback(new Error('خطا! رمز وارد شده نادرست است'))
+      var formerPhone = clientInst.phoneNumber
+      clientInst.updateAttribute('phoneNumber', phoneNumber, function(err, updateInst) { 
+        if (err)
+          return callback(err)
+        if (!updateInst)
+          return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
+        var verification = app.models.verification
+        verification.find({where:{phoneNumber: formerPhone}, limit: 50000}, function(err, verifResult) {
+          if (err)
+            return callback(err)
+          if (verifResult.length == 0)
+            return callback(new Error('خطا! کاربری با این مشخصات وجود ندارد'))
+          var verfModel = verifResult[0]
+          verification.destroyById(verfModel.id, function(err, result) {
+            if (err)
+              return callback(err)
+            return callback(null, verfModel)
+          })
+        })
+      })
+    })
+  }
+
+  client.remoteMethod('changePhone', {
+    description: 'change phone number of user and send user verficiation if needed',
+    accepts: [{
+      arg: 'data',
+      type: 'object',
+      required: true,
+      http: {
+        source: 'body'
+      }
+    }],
+    http: {
+      path: '/changePhone',
+      verb: 'PUT',
       status: 200,
       errorStatus: 400
     },
